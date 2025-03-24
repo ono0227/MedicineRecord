@@ -3,13 +3,9 @@ Rails.application.routes.draw do
     namespace :v1 do
       mount_devise_token_auth_for 'User', at: 'auth', controllers: {
         registrations: 'api/v1/auth/registrations',
-        sessions: "api/v1/auth/sessions",
         passwords: "api/v1/auth/passwords"
       }
-
-      devise_scope :v1_user do
-        post "auth/guest_sign_in", to: "auth/sessions#guest_sign_in"
-      end
+      get "users/currentuser"
     end
   end
 
@@ -18,7 +14,6 @@ Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
-
   # Defines the root path route ("/")
   # root "posts#index"
 end
