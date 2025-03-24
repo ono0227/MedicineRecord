@@ -1,9 +1,10 @@
 const initialState = {
-    user : {
+    users : {
         isSignedIn: false,
         uid: "",
         username: "",
-        image: [],
+        email: "",
+        image: ""
     }
 
 }

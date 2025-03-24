@@ -1,10 +1,15 @@
 import React from 'react';
+import Router from './Router'
+import Header from './components/Header/Header';
 
 const App = () => {
   return (
-    <div>
-      <h1>Hello, World!</h1>
-    </div>
+    <>
+      <Header />
+      <main>
+        <Router />
+      </main>
+    </>
   );
 };
 
