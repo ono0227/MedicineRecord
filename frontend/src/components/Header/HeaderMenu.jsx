@@ -20,11 +20,11 @@ const HeaderMenu = (props) => {
     return (
         <div>
             <IconButton onClick={handleMenuToggle}>
-                src={props.userimage} alt="ユーザ画像"
+                <img src={props.userimage} alt="ユーザ画像" width="50px" height="40px"/>
             </IconButton>
             <Menu open={open} onClose={handleMenuToggle}>
                 <MenuItem button onClick={() => dispatch(push('/users/detail'))}>ユーザ設定 </MenuItem>
-                <MenuItem button onClick={() => dispatch(push(signOut()))}>サインアウト</MenuItem>
+                <MenuItem button onClick={() => dispatch(signOut())}>サインアウト</MenuItem>
             </Menu>
         </div>
     )
