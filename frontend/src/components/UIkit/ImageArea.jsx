@@ -12,24 +12,31 @@ const useStyles = makeStyles({
 
 const ImageArea = (props) => {
     const classes = useStyles();
-    const image = props.image,
-          setImage = props.setImage;
+    const image = props.nextuserimage,
+          setImage = props.setNextUserImage;
         
     const previewImage = (event) => {
-        setImage("")
+        setImage("");
         setImage(window.URL.createObjectURL(event.target.files[0]))
     }
 
     return(
         <div>
-            {image !== ""&& <img src={image} alt="プレビュー画像" /> }
-            <span>画像を登録する</span>
-            <IconButton className={classes.icon}>
-                <label>
-                  <AddPhotoAlternateIcon />
-                  <input className="display-none" type="file" id="image" onChange={(event)=> previewImage(event)} />
-                </label>
-            </IconButton>
+            <div className="p-grid_list-images">
+                {image !== ""&& <img src={image} alt="プレビュー画像" /> }
+            </div>
+            <div className="u-text-right">
+                <span>画像を登録する</span>
+                <IconButton className={classes.icon}>
+                    <label>
+                        <AddPhotoAlternateIcon />
+                        <input 
+                            className="u-display-none" type="file" id="image" 
+                            onChange={(event)=> previewImage(event)} 
+                        />
+                    </label>
+                </IconButton>
+            </div>
         </div>
     )
 }
