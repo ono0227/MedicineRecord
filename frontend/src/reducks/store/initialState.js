@@ -1,10 +1,12 @@
+import noprofile from "../../assets/img/no-profile.png"
+
 const initialState = {
     users : {
         isSignedIn: false,
         uid: "",
         username: "",
         email: "",
-        image: ""
+        image: noprofile
     }
 
 }

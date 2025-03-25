@@ -13,18 +13,22 @@ const ResetPassword = () => {
     }, [setEmail])
 
     return (
-        <>
-          <h2>パスワード再設定の手続き</h2>
+        <div className="c-section-container">
+          <h2 className="u-text__headline u-text-center">パスワード再設定の手続き</h2>
+          <div className="module-spacer--medium"/>
           <TextInput
               fullWidth={true} label={"メールアドレス"} multiline={false} required={true}
               rows={1} value={email} type={"email"} onChange={inputEmail}
           />
-          <PrimaryButton
-              label={"パスワード再設定用のURLを送信"}
-              onClick={() => dispatch(sendPasswordURL(email))}
-          />
-          <p onClick={() => dispatch(push('/signin'))}>ログイン画面に戻る</p>
-        </>
+          <div className="module-spacer--medium"/>
+          <div className="center">
+            <PrimaryButton
+                label={"パスワード再設定用のURLを送信"}
+                onClick={() => dispatch(sendPasswordURL(email))}
+            />
+            <p onClick={() => dispatch(push('/signin'))}>ログイン画面に戻る</p>
+          </div>
+        </div>
     )
 }
 

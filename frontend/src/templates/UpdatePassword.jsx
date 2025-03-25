@@ -18,8 +18,9 @@ const UpdatePassword = () => {
     }, [setComfirmPassword]);
 
     return (
-        <>
-          <h2>パスワードを更新</h2>
+        <div className="c-section-container">
+          <h2 className="u-text__headline u-text-center">パスワードを更新</h2>
+          <div className="module-spacer--medium"/>
           <TextInput
                 fullWidth={true} label={"パスワード"} multiline={false} required={true}
                 rows={1} value={password} type={"password"} onChange={inputPassword}
@@ -28,11 +29,14 @@ const UpdatePassword = () => {
                 fullWidth={true} label={"パスワード（再確認）"} multiline={false} required={true}
                 rows={1} value={confirmPassword} type={"password"} onChange={inputConfirmPassword}
           />
-          <PrimaryButton
-              label={"パスワードを更新"}
-              onClick={() => dispatch(updatePassword(password,confirmPassword))}
-          />
-        </>
+           <div className="module-spacer--medium"/>
+           <div className="center">
+              <PrimaryButton
+                  label={"パスワードを更新"}
+                  onClick={() => dispatch(updatePassword(password,confirmPassword))}
+              />
+            </div>
+        </div>
     )
 }
 export default UpdatePassword;
