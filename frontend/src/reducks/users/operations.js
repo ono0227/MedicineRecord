@@ -5,7 +5,6 @@ import axios from 'axios';
 const authUrl = process.env.REACT_APP_AUTH_URL,
       signInUrl = process.env.REACT_APP_SIGN_IN_URL,
       signOutUrl = process.env.REACT_APP_SIGN_OUT_URL,
-      editUserUrl = process.env.REACT_APP_EDIT_USER_URL,
       passwordUrl = process.env.REACT_APP_PASSWORD_URL,
       updatePasswordUrl = process.env.REACT_APP_UPDATE_PASSWORD_URL,
       listenAuthStateUrl = process.env.REACT_APP_LISTEN_AUTH_STATE_URL;
@@ -70,7 +69,7 @@ export const signUp = (username, email, password, confirmPassword) => {
             localStorage.setItem('access-token', accessToken)
             localStorage.setItem('client', client)
             localStorage.setItem('uid', uid)
-            dispatch(push('/'));
+            dispatch(push('/timeline'));
         } catch(error) {
             console.error('Can not sign up', error);
             alert('サインアップに失敗しました。もう一度お試しください')
@@ -109,7 +108,7 @@ export const signIn = (email, password) => {
                 email: response.data.data.email,
                 image: response.data.data.image
             }))
-            dispatch(push('/'))
+            dispatch(push('/timeline'))
         } catch(error) {
             console.error('Can not sign in', error);
             alert('サインインできませんでした。もう一度お試しください')
@@ -194,7 +193,7 @@ export const guestSignIn = () => {
                 email: response.data.data.email,
                 image: response.data.data.image
             }))
-            dispatch(push('/'))
+            dispatch(push('/timeline'))
 
         } catch(error) {
             console.error('Can not guest sign in', error);
@@ -203,21 +202,27 @@ export const guestSignIn = () => {
     }
 }
 
-export const updateUser = (email, username, image) => {
+export const updateUser = (nextuserimage, nextusername, nextemail) => {
     return async(dispatch) => {
-        if(email === "" || username === "") {
+        if(nextemail === "" || nextusername === "") {
             alert("必要項目が未入力です");
             return false
         }
-        if(image === ""){
+        if(nextuserimage === ""){
             alert("アカウント画像が未設定です");
             return false
         }
         try {
-            const response = await axios.put(editUserUrl, {
-                email: email,
-                name: username,
-                image: image
+            const response = await axios.put(authUrl, {
+                email: nextemail,
+                name: nextusername,
+                image: nextuserimage
+            }, {
+                headers: {
+                    'access-token': localStorage.getItem('access-token'),
+                    'client': localStorage.getItem('client'),
+                    'uid': localStorage.getItem('uid')
+                }
             })
 
             dispatch(signInAction({
@@ -227,7 +232,7 @@ export const updateUser = (email, username, image) => {
                 email: response.data.data.email,
                 image: response.data.data.image
             }))
-            dispatch(push('/'))
+            dispatch(push('/users/detail'))
 
         } catch(error) {
             console.error('Can not update user', error);
@@ -254,11 +259,6 @@ export const sendPasswordURL = (email) => {
 
         }catch(error) {
             console.error('Can not send link', error);
-            if (error.response) {
-                console.error('Response data:', error.response.data);
-                console.error('Response status:', error.response.status);
-                console.error('Response headers:', error.response.headers);
-            }
             alert('パスワード再設定用リンクを送信できませんでした。もう一度お試しください')
         };
     }
@@ -277,7 +277,7 @@ export const updatePassword = (password, confirmPassword) => {
                 password_confirmation: confirmPassword
             })
 
-            dispatch(push('/'))
+            dispatch(push('/signin'))
         
         }catch(error) {
             console.error('Can not reset password', error);

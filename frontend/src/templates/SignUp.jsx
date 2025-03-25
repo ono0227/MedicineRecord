@@ -30,8 +30,9 @@ const SignUp = () => {
     }, [setComfirmPassword]);
 
     return (
-        <>
-          <h2>アカウント登録</h2>
+        <div className="c-section-container">
+          <h2 className="u-text__headline u-text-center">アカウント登録</h2>
+          <div className="module-spacer--medium"/>
           <TextInput
               fullWidth={true} label={"ユーザ名"} multiline={false} required={true}
               rows={1} value={username} type={"text"} onChange={inputUsername}
@@ -48,14 +49,15 @@ const SignUp = () => {
               fullWidth={true} label={"パスワード（再確認）"} multiline={false} required={true}
               rows={1} value={confirmPassword} type={"password"} onChange={inputConfirmPassword}
           />
-          <PrimaryButton
-              label={"アカウントを登録する"}
-              onClick={() => dispatch(signUp(username, email, password, confirmPassword))}
-          />
-          <p onClick={() => dispatch(push('/signin'))}>
-              アカウントをお持ちの方はこちら
-          </p>
-        </>
+          <div className="module-spacer--medium"/>
+          <div className="center">
+            <PrimaryButton
+                label={"アカウントを登録する"}
+                onClick={() => dispatch(signUp(username, email, password, confirmPassword))}
+            />
+            <p onClick={() => dispatch(push('/signin'))}>アカウントをお持ちの方はこちら</p>
+          </div>
+        </div>
     )
 }
 

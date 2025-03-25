@@ -19,8 +19,10 @@ const SignIn = () => {
     }, [setPassword])
 
     return (
-        <>
-          <h2>サインイン</h2>
+        <div className="c-section-container">
+          <h2 className="u-text__headline u-text-center">サインイン</h2>
+          <div className="module-spacer--medium"/>
+
           <TextInput
               fullWidth={true} label={"メールアドレス"} multiline={false} required={true}
               rows={1} value={email} type={"email"} onChange={inputEmail}
@@ -29,13 +31,16 @@ const SignIn = () => {
               fullWidth={true} label={"パスワード"} multiline={false} required={true}
               rows={1} value={password} type={"password"} onChange={inputPassword}
           />
-          <PrimaryButton
-              label={"サインイン"}
-              onClick={() => dispatch(signIn(email, password))}
-          />
-          <p onClick={() => dispatch(push('/signup'))}>アカウントをお持ちでない方はこちら</p>
-          <p onClick={() => dispatch(push('/password/reset'))}>パスワードを忘れた方はこちら</p>
-        </>
+          <div className="module-spacer--medium"/>
+          <div className="center">
+            <PrimaryButton
+                label={"サインイン"}
+                onClick={() => dispatch(signIn(email, password))}
+            />
+            <p onClick={() => dispatch(push('/signup'))}>アカウントをお持ちでない方はこちら</p>
+            <p onClick={() => dispatch(push('/password/reset'))}>パスワードを忘れた方はこちら</p>
+          </div>
+        </div>
     )
 }
 

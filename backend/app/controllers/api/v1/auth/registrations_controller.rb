@@ -2,7 +2,7 @@ class Api::V1::Auth::RegistrationsController < DeviseTokenAuth::RegistrationsCon
   before_action :ensure_not_guest_user, only: [:update, :destroy]
 
   def ensure_not_guest_user
-    if current_user && current_user.email == 'guest@example.com'
+    if current_api_v1_user && current_api_v1_user.email == 'guest@example.com'
       render json: { error: 'ゲストユーザーはアカウント情報を変更できません。' }, status: :forbidden
     end
   end
@@ -13,7 +13,6 @@ class Api::V1::Auth::RegistrationsController < DeviseTokenAuth::RegistrationsCon
     end
     
     def account_update_params
-      params.permit(:name, :email, :image)
+      params.require(:registration).permit(:name, :email, :image)
     end
-  
 end
