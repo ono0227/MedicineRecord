@@ -1,7 +1,5 @@
-import noprofile from "../../assets/img/no-profile.png"
-
 export const SIGN_IN = "SIGN_IN";
-export const signInAction = (userState) => {
+export const signInAction = (userState) => {    
     return {
         type: "SIGN_IN",
         payload: {
@@ -9,7 +7,7 @@ export const signInAction = (userState) => {
             uid: userState.uid,
             username: userState.username,
             email: userState.email,
-            image: userState.image
+            userimage: userState.userimage
         }
     }
 }
@@ -23,7 +21,7 @@ export const signOutAction = () => {
             uid: "",
             username: "",
             email: "",
-            image: noprofile
+            userimage: ""
         }
     }
     

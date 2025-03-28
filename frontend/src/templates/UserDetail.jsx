@@ -1,10 +1,11 @@
-import React from "react"
+import React, { useCallback } from "react"
 import { PrimaryButton } from "../components/UIkit";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteUser } from "../reducks/users/operations";
 import { push } from "connected-react-router";
 import { getEmail, getUserId, getUserImage, getUserName } from "../reducks/users/selectors";
 import { makeStyles } from "@material-ui/core";
+import guestuserimage from "../assets/img/guestuserimage.png";
 
 const useStyles = makeStyles((theme) => ({
     detail: {
@@ -30,14 +31,23 @@ const UserDetail = () => {
           userimage = getUserImage(selector),
           email = getEmail(selector),
           userid = getUserId(selector);
+    
+    const isGuestUser = useCallback(() => {
+        return username === "ゲストユーザ";
+    }, [username]);
  
     return (
         <div className="c-section-wrapin">
             {userid && (
                 <div className="p-grid__row">
-                    <img src={userimage} alt="ユーザ画像" />
+                    {isGuestUser() ? (
+                        <img src={guestuserimage} alt="ゲスト" />
+                    ) : (
+                        <img src={userimage} alt="ユーザ" />
+                    )}
                     <div className={classes.detail}>
-                        <h3 className="u-text__headline">{username}</h3>
+                        <div className="module-spacer--small"/>
+                        <p>{username}</p>
                         <div className="module-spacer--small"/>
                         <p>{email}</p>
                         <div className="module-spacer--medium"/>
