@@ -3,7 +3,8 @@ Rails.application.routes.draw do
     namespace :v1 do
       mount_devise_token_auth_for 'User', at: 'auth', controllers: {
         registrations: 'api/v1/auth/registrations',
-        passwords: "api/v1/auth/passwords"
+        passwords: "api/v1/auth/passwords",
+        sessions: 'api/v1/auth/sessions'
       }
       get "users/currentuser"
     end
