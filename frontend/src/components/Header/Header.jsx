@@ -1,7 +1,7 @@
 import React from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import { getIsSignedIn, getUserImage } from "../../reducks/users/selectors";
+import { getIsSignedIn, getUserImage, getUserName } from "../../reducks/users/selectors";
 import {push} from "connected-react-router";
 import { useDispatch, useSelector } from "react-redux";
 import HeaderMenu from "./HeaderMenu";
@@ -30,8 +30,10 @@ const useStyles = makeStyles({
 const Header = () => {
     const dispatch = useDispatch();
     const selector = useSelector((state) => state);
-    const isSignedIn = getIsSignedIn(selector);
-    const userimage = getUserImage(selector);
+    const isSignedIn = getIsSignedIn(selector),
+          userimage = getUserImage(selector),
+          username = getUserName(selector);
+
     const classes = useStyles();
 
     const handleLogoClick = () => {
@@ -47,17 +49,17 @@ const Header = () => {
           <AppBar position="fixed" className={classes.menuBar}>
               <Toolbar className={classes.toolBar}>
                   <img src={logo} alt="サイトロゴ" width="50px" 
-                    onClick={() => dispatch(handleLogoClick)}/>
+                    onClick={handleLogoClick}/>
                   {!isSignedIn && (
                     <div className="p-grid__row">
                       <PrimaryButton
                         label={"新規登録"}
                         onClick={() => dispatch(push('/signup'))}
-                      />,
+                      />
                       <PrimaryButton
                         label={"ゲストログイン"}
                         onClick={() => dispatch((guestSignIn()))}
-                      />,
+                      />
                       <PrimaryButton
                         label={"ログイン"}
                         onClick={() => dispatch(push('/signin'))}
@@ -66,7 +68,7 @@ const Header = () => {
                   )}
                   {isSignedIn && (
                     <div className={classes.iconButtons}>
-                      <HeaderMenu userimage={userimage} />
+                      <HeaderMenu userimage={userimage} username={username} />
                     </div>
                   )}
               </Toolbar>
