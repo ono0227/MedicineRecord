@@ -30,7 +30,8 @@ export const listenAuthState = () => {
                         uid: response.data.data.uid,
                         username: response.data.data.name,
                         email: response.data.data.email,
-                        image: response.data.data.image
+                        // userimage: response.data.data.image
+                        userimage: `http://localhost:3000${response.data.data.image}`
                     }));
                 }).catch(error => {
                     console.error(' Error Auth User', error);
@@ -42,7 +43,7 @@ export const listenAuthState = () => {
     }                    
 }
 
-export const signUp = (username, email, password, confirmPassword) => {
+export const signUp = (username, email, password, confirmPassword, userimage) => {
     return async(dispatch) => {
         if (username === "" || email === "" || password === "") {
             alert("必要項目が未入力です");
@@ -54,13 +55,24 @@ export const signUp = (username, email, password, confirmPassword) => {
             return false
         }
 
+        if (!userimage || !(userimage instanceof File)) {
+            alert("アカウント画像が未設定です");
+            return false;
+        }
+
         try {
-            const response = await axios.post(authUrl,{
-                name: username,
-                email: email,
-                password: password,
-                password_confirmation: confirmPassword
-            })
+            const formData = new FormData();
+            formData.append("name", username);
+            formData.append("email", email);
+            formData.append("password", password);
+            formData.append("password_confirmation", confirmPassword);
+            formData.append("image", userimage);
+
+            const response = await axios.post(authUrl, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            });
 
             const accessToken = response.headers['access-token'],
                   client = response.headers['client'],
@@ -69,6 +81,15 @@ export const signUp = (username, email, password, confirmPassword) => {
             localStorage.setItem('access-token', accessToken)
             localStorage.setItem('client', client)
             localStorage.setItem('uid', uid)
+
+            dispatch(signInAction({
+                isSignedIn: true,
+                uid: response.data.data.uid,
+                username: response.data.data.name,
+                email: response.data.data.email,
+                // userimage: response.data.data.image
+                userimage: `http://localhost:3000${response.data.data.image}`
+            }))
             dispatch(push('/timeline'));
         } catch(error) {
             console.error('Can not sign up', error);
@@ -83,30 +104,31 @@ export const signIn = (email, password) => {
             alert("必要項目が未入力です");
             return false
         }
+        
+        localStorage.clear()
+        dispatch(signOutAction())
 
         try {
             const response = await axios.post(signInUrl,{
                 email: email,
                 password: password
             });
-            if (!localStorage.getItem('access-token') 
-                && !localStorage.getItem('client')
-                && !localStorage.getItem('uid')) {
-                    const accessToken = response.headers['access-token'],
-                    client = response.headers['client'],
-                    uid = response.headers['uid'];
 
-                    localStorage.setItem('access-token', accessToken)
-                    localStorage.setItem('client', client)
-                    localStorage.setItem('uid', uid)
-            }
+            const accessToken = response.headers['access-token'],
+                  client = response.headers['client'],
+                  uid = response.headers['uid'];
 
+            localStorage.setItem('access-token', accessToken);
+            localStorage.setItem('client', client);
+            localStorage.setItem('uid', uid);
+            
             dispatch(signInAction({
                 isSignedIn: true,
                 uid: response.data.data.uid,
                 username: response.data.data.name,
                 email: response.data.data.email,
-                image: response.data.data.image
+                // userimage: response.data.data.image,
+                userimage: `http://localhost:3000${response.data.data.image}`
             }))
             dispatch(push('/timeline'))
         } catch(error) {
@@ -166,33 +188,34 @@ export const deleteUser = () => {
 export const guestSignIn = () => {
     return async(dispatch) => {
         const username = "ゲストユーザ",
-              email = "guest@example.com",
-              password = Math.random().toString(36).slice(-8),
+              email = Math.random().toString(36).slice(-16) +"@example.com",
+              password = Math.random().toString(36).slice(-12),
               confirmPassword = password;
         
-        localStorage.clear()
-        dispatch(signOutAction())
+        localStorage.clear();
+        dispatch(signOutAction());
 
         try {
-            const response = await axios.post(authUrl,{
+            await axios.post(authUrl,{
                 name: username,
                 email: email,
                 password: password,
                 password_confirmation: confirmPassword
             } )
 
-            await axios.post(signInUrl,{
+            const response = await axios.post(signInUrl,{
                   email: email,
                   password: password
             });
+
+            const accessToken = response.headers['access-token'],
+                  client = response.headers['client'],
+                  uid = response.headers['uid'];
+
+            localStorage.setItem('access-token', accessToken);
+            localStorage.setItem('client', client);
+            localStorage.setItem('uid', uid);
     
-            dispatch(signInAction({
-                isSignedIn: true,
-                uid: response.data.data.uid,
-                username: response.data.data.name,
-                email: response.data.data.email,
-                image: response.data.data.image
-            }))
             dispatch(push('/timeline'))
 
         } catch(error) {
@@ -202,35 +225,41 @@ export const guestSignIn = () => {
     }
 }
 
-export const updateUser = (nextuserimage, nextusername, nextemail) => {
+export const updateUser = (userimage, username, email) => {
     return async(dispatch) => {
-        if(nextemail === "" || nextusername === "") {
+        if(email === "" || username === "") {
             alert("必要項目が未入力です");
             return false
         }
-        if(nextuserimage === ""){
+        if(!userimage || !(userimage instanceof File)){
             alert("アカウント画像が未設定です");
             return false
         }
         try {
-            const response = await axios.put(authUrl, {
-                email: nextemail,
-                name: nextusername,
-                image: nextuserimage
-            }, {
+            // FormData を作成
+            const formData = new FormData();
+            formData.append("name", username);
+            formData.append("email", email);
+            formData.append("image", userimage);
+
+            // PUT リクエストを送信
+            const response = await axios.put(authUrl, formData, {
                 headers: {
+                    'Content-Type': 'multipart/form-data',
                     'access-token': localStorage.getItem('access-token'),
                     'client': localStorage.getItem('client'),
                     'uid': localStorage.getItem('uid')
                 }
-            })
+            });
 
+            // レスポンスを Redux に保存
             dispatch(signInAction({
                 isSignedIn: true,
                 uid: response.data.data.uid,
                 username: response.data.data.name,
                 email: response.data.data.email,
-                image: response.data.data.image
+                // userimage: response.data.data.image
+                userimage: `http://localhost:3000${response.data.data.image}`
             }))
             dispatch(push('/users/detail'))
 
