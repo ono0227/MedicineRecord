@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import IconButton from "@material-ui/core/IconButton";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import { makeStyles } from "@material-ui/core";
@@ -10,20 +10,24 @@ const useStyles = makeStyles({
     }
 })
 
-const ImageArea = (props) => {
+const UserImageArea = (props) => {
     const classes = useStyles();
-    const image = props.nextuserimage,
-          setImage = props.setNextUserImage;
+    const { userimage, setUserImage} = props;
+    
+    const [preview, setPreview] = useState(userimage || "");
         
-    const previewImage = (event) => {
-        setImage("");
-        setImage(window.URL.createObjectURL(event.target.files[0]))
-    }
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setPreview(URL.createObjectURL(file)); // プレビュー用
+            setUserImage(file); // Fileオブジェクトを保持
+        }
+    };
 
     return(
         <div>
             <div className="p-grid_list-images">
-                {image !== ""&& <img src={image} alt="プレビュー画像" /> }
+                { preview&& <img src={preview} alt="プレビュー" style={{ maxWidth: "100%" }} /> }
             </div>
             <div className="u-text-right">
                 <span>画像を登録する</span>
@@ -31,8 +35,10 @@ const ImageArea = (props) => {
                     <label>
                         <AddPhotoAlternateIcon />
                         <input 
-                            className="u-display-none" type="file" id="image" 
-                            onChange={(event)=> previewImage(event)} 
+                            className="u-display-none" 
+                            type="file" 
+                            accept="image/*"
+                            onChange={handleImageChange} 
                         />
                     </label>
                 </IconButton>
@@ -41,4 +47,4 @@ const ImageArea = (props) => {
     )
 }
 
-export default ImageArea
+export default UserImageArea

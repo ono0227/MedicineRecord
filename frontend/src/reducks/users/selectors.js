@@ -24,5 +24,5 @@ export const getEmail = createSelector(
 
 export const getUserImage = createSelector(
     [usersSelector],
-    state => state.image
+    state => state.userimage
 )
