@@ -6,7 +6,11 @@ Rails.application.routes.draw do
         passwords: "api/v1/auth/passwords",
         sessions: 'api/v1/auth/sessions'
       }
+      resources :categories, only: [:index]
+      resources :posts
+      resources :medicines
       get "users/currentuser"
+      get "up" => "rails/health#show", as: :rails_health_check
     end
   end
 
@@ -14,7 +18,6 @@ Rails.application.routes.draw do
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
   # Defines the root path route ("/")
   # root "posts#index"
 end
