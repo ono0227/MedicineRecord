@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_30_035439) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_29_132839) do
   create_table "categories", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -23,18 +23,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_30_035439) do
     t.string "memo"
     t.integer "ingestion_times_per_day"
     t.integer "ingestion_amount_per_day"
+    t.bigint "user_id"
+    t.bigint "category_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_medicines_on_category_id"
+    t.index ["user_id"], name: "index_medicines_on_user_id"
   end
 
   create_table "posts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "ingestion_amount"
-    t.string "integer"
     t.string "comment"
+    t.bigint "user_id"
+    t.bigint "medicine_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "medicine_id"
     t.index ["medicine_id"], name: "index_posts_on_medicine_id"
+    t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -55,13 +60,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_30_035439) do
     t.datetime "last_sign_in_at"
     t.string "current_sign_in_ip"
     t.string "last_sign_in_ip"
-    t.bigint "medicine_id"
     t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["medicine_id"], name: "index_users_on_medicine_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
+  add_foreign_key "medicines", "categories"
+  add_foreign_key "medicines", "users"
   add_foreign_key "posts", "medicines"
-  add_foreign_key "users", "medicines"
+  add_foreign_key "posts", "users"
 end

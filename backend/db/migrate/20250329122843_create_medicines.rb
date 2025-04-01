@@ -6,10 +6,10 @@ class CreateMedicines < ActiveRecord::Migration[7.2]
       t.string :memo
       t.integer :ingestion_times_per_day
       t.integer :ingestion_amount_per_day
+      t.references :user, foreign_key: true
+      t.references :category, foreign_key: true
 
       t.timestamps
     end
-    add_reference :users, :medicine, foreign_key: true
-    add_reference :categories, :medicine, foreign_key: true
   end
 end

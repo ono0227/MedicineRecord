@@ -6,12 +6,12 @@ class PostsController < ApplicationController
   def index
     @posts = current_user.posts.all.includes(:medicine)
 
-    posts_with_medicine = @posts.map do |post|
+    posts_with_medicine_with_category = @posts.map do |post|
       post.as_json.merge(medicine_name: post.medicine&.name)
       post.as_json.merge(medicine_image: post.medicine&.medicine_image)
     end
 
-    render json: posts_with_medicine
+    render json: posts_with_medicine_category
   end
 
   #def index
@@ -26,7 +26,10 @@ class PostsController < ApplicationController
 
   # POST /posts
   def create
-    @post = current_user.posts.new(post_params)
+    medicine_name = params[:medicine_name]
+    medicine_image = params[:medicine_image]
+    medicine = current_user.posts.find_or_create_by(name: medicine_name && medicine_image: medicine_image)
+    @post = current_user.posts.new(post_params.merge(medicine_id: medicine.id))
 
     if @post.save
       render json: @post, status: :created, location: @post
@@ -37,7 +40,11 @@ class PostsController < ApplicationController
 
   # PATCH/PUT /posts/1
   def update
-    if @post.update(post_params)
+    medicine_name = params[:medicine_name]
+    medicine_image = params[:medicine_image]
+    medicine = current_user.posts.find_or_create_by(name: medicine_name && medicine_image: medicine_image)
+
+    if @post.update(post_params.merge(medicine_id: medicine.id))
       render json: @post
     else
       render json: @post.errors, status: :unprocessable_entity
@@ -59,6 +66,6 @@ class PostsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def post_params
-      params.require(:post).permit(:medicine_id, :ingestion_amount, :comment)
+      params.require(:post).permit(:ingestion_amount, :comment)
     end
 end
