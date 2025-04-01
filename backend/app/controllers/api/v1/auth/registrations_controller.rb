@@ -1,6 +1,6 @@
 class Api::V1::Auth::RegistrationsController < DeviseTokenAuth::RegistrationsController
   before_action :ensure_not_guest_user, only: [:update, :destroy]
-  
+
   private
 
   def ensure_not_guest_user
@@ -10,7 +10,7 @@ class Api::V1::Auth::RegistrationsController < DeviseTokenAuth::RegistrationsCon
   end
 
   def sign_up_params
-    params.permit(:name, :email, :password, :password_confirmation, :image)
+    params.permit(:name, :email, :password, :password_confirmation)
   end
 
   def account_update_params

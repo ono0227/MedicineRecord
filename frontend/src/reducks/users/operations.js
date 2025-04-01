@@ -11,27 +11,26 @@ const authUrl = process.env.REACT_APP_AUTH_URL,
 
 export const listenAuthState = () => {
     return async(dispatch) => {
-        if(localStorage.getItem('access-token') 
+        if(localStorage.getItem('access-token')
             && localStorage.getItem('client')
             && localStorage.getItem('uid')){
                 const  accessToken = localStorage.getItem('access-token'),
                        client = localStorage.getItem('client'),
                        uid = localStorage.getItem('uid');
-        
+
                 await axios.get(listenAuthStateUrl, {
                   headers: {
                     'access-token': accessToken,
                     'client': client,
-                    'uid': uid 
-                  }       
+                    'uid': uid
+                  }
                 }).then((response) => {
                     dispatch(signInAction({
                         isSignedIn: true,
                         uid: response.data.data.uid,
                         username: response.data.data.name,
                         email: response.data.data.email,
-                        // userimage: response.data.data.image
-                        userimage: `http://localhost:3000${response.data.data.image}`
+                        userimage: response.data.data.image
                     }));
                 }).catch(error => {
                     console.error(' Error Auth User', error);
@@ -40,10 +39,10 @@ export const listenAuthState = () => {
         } else {
             dispatch(push('/'))
         }
-    }                    
+    }
 }
 
-export const signUp = (username, email, password, confirmPassword, userimage) => {
+export const signUp = (username, email, password, confirmPassword) => {
     return async(dispatch) => {
         if (username === "" || email === "" || password === "") {
             alert("必要項目が未入力です");
@@ -55,24 +54,13 @@ export const signUp = (username, email, password, confirmPassword, userimage) =>
             return false
         }
 
-        if (!userimage || !(userimage instanceof File)) {
-            alert("アカウント画像が未設定です");
-            return false;
-        }
-
         try {
-            const formData = new FormData();
-            formData.append("name", username);
-            formData.append("email", email);
-            formData.append("password", password);
-            formData.append("password_confirmation", confirmPassword);
-            formData.append("image", userimage);
-
-            const response = await axios.post(authUrl, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
-            });
+            const response = await axios.post(authUrl,{
+                name: username,
+                email: email,
+                password: password,
+                password_confirmation: confirmPassword
+            })
 
             const accessToken = response.headers['access-token'],
                   client = response.headers['client'],
@@ -82,14 +70,6 @@ export const signUp = (username, email, password, confirmPassword, userimage) =>
             localStorage.setItem('client', client)
             localStorage.setItem('uid', uid)
 
-            dispatch(signInAction({
-                isSignedIn: true,
-                uid: response.data.data.uid,
-                username: response.data.data.name,
-                email: response.data.data.email,
-                // userimage: response.data.data.image
-                userimage: `http://localhost:3000${response.data.data.image}`
-            }))
             dispatch(push('/timeline'));
         } catch(error) {
             console.error('Can not sign up', error);
@@ -104,7 +84,7 @@ export const signIn = (email, password) => {
             alert("必要項目が未入力です");
             return false
         }
-        
+
         localStorage.clear()
         dispatch(signOutAction())
 
@@ -121,14 +101,13 @@ export const signIn = (email, password) => {
             localStorage.setItem('access-token', accessToken);
             localStorage.setItem('client', client);
             localStorage.setItem('uid', uid);
-            
+
             dispatch(signInAction({
                 isSignedIn: true,
                 uid: response.data.data.uid,
                 username: response.data.data.name,
                 email: response.data.data.email,
-                // userimage: response.data.data.image,
-                userimage: `http://localhost:3000${response.data.data.image}`
+                userimage: response.data.data.image
             }))
             dispatch(push('/timeline'))
         } catch(error) {
@@ -143,13 +122,13 @@ export const signOut = () => {
         const  accessToken = localStorage.getItem('access-token'),
                client = localStorage.getItem('client'),
                uid = localStorage.getItem('uid');
-        
+
         await axios.delete(signOutUrl, {
             headers: {
                 'access-token': accessToken,
                 'client': client,
-                'uid': uid 
-            }       
+                'uid': uid
+            }
         }).then(() => {
             localStorage.clear()
             dispatch(signOutAction())
@@ -157,27 +136,27 @@ export const signOut = () => {
         }).catch(error => {
             console.error(' Error Sign out', error);
             alert('サインアウトに失敗しました')
-        });        
+        });
     }
 }
 
 export const deleteUser = () => {
     return async(dispatch) => {
-        
+
         const  accessToken = localStorage.getItem('access-token'),
                client = localStorage.getItem('client'),
                uid = localStorage.getItem('uid');
-        
+
         await axios.delete(authUrl, {
             headers: {
                 'access-token': accessToken,
                 'client': client,
                 'uid': uid
-            }        
+            }
         }).then(() => {
             localStorage.clear()
             dispatch(signOutAction())
-            dispatch(push('/'))          
+            dispatch(push('/'))
         }).catch(error => {
             console.error(' Error Sign out', error);
             alert('アカウント削除に失敗しました')
@@ -191,7 +170,7 @@ export const guestSignIn = () => {
               email = Math.random().toString(36).slice(-16) +"@example.com",
               password = Math.random().toString(36).slice(-12),
               confirmPassword = password;
-        
+
         localStorage.clear();
         dispatch(signOutAction());
 
@@ -215,7 +194,7 @@ export const guestSignIn = () => {
             localStorage.setItem('access-token', accessToken);
             localStorage.setItem('client', client);
             localStorage.setItem('uid', uid);
-    
+
             dispatch(push('/timeline'))
 
         } catch(error) {
@@ -307,7 +286,7 @@ export const updatePassword = (password, confirmPassword) => {
             })
 
             dispatch(push('/signin'))
-        
+
         }catch(error) {
             console.error('Can not reset password', error);
             alert('パスワードを更新できませんでした。もう一度お試しください')

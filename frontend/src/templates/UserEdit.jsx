@@ -13,32 +13,34 @@ const UserEdit = () => {
     const prevusername = getUserName(selector),
           prevuserimage = getUserImage(selector),
           prevemail = getEmail(selector);
-    
+
     const [username, setUsername] = useState(prevusername),
           [email, setEmail] = useState(prevemail),
           [userimage, setUserImage] = useState(prevuserimage);
-    
-    
+
+
     const inputUsername = useCallback((event) => {
         setUsername(event.target.value)
     }, [setUsername]);
-    
+
     const inputEmail = useCallback((event) => {
         setEmail(event.target.value)
     }, [setEmail]);
 
-    const isGuestUser = useCallback(() => {
-        return prevusername === "ゲストユーザ";
-    }, [prevusername]);
+    const hasUserimage = useCallback(() => {
+        return prevusername === "ゲストユーザ" ||
+            (prevusername !== "ゲストユーザ" &&
+            prevuserimage === "");
+    }, [prevusername, prevuserimage]);
 
     return (
         <section>
            <h2 className="u-text_headline u-text-center">ユーザ情報の編集</h2>
            <div className="c-section-container">
-                { isGuestUser()? (
+                { hasUserimage()? (
                     <UserImageArea userimage={guestuserimage} setUserImage={setUserImage} />
                 ) : (
-                    <UserImageArea userimage={userimage} setUserImage={setUserImage} />                    
+                    <UserImageArea userimage={userimage} setUserImage={setUserImage} />
                 )}
                <TextInput
                    fullWidth={true} label={"ユーザ名"} multiline={false} required={true}
