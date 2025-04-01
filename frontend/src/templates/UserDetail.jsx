@@ -31,17 +31,19 @@ const UserDetail = () => {
           userimage = getUserImage(selector),
           email = getEmail(selector),
           userid = getUserId(selector);
-    
-    const isGuestUser = useCallback(() => {
-        return username === "ゲストユーザ";
-    }, [username]);
- 
+
+    const hasUserimage = useCallback(() => {
+        return username === "ゲストユーザ" ||
+        　　 (username !== "ゲストユーザ" &&
+            userimage === "");
+    }, [username, userimage]);
+
     return (
         <div className="c-section-wrapin">
             {userid && (
                 <div className="p-grid__row">
-                    {isGuestUser() ? (
-                        <img src={guestuserimage} alt="ゲスト" />
+                    {hasUserimage() ? (
+                        <img src={guestuserimage} alt="仮画像" />
                     ) : (
                         <img src={userimage} alt="ユーザ" />
                     )}
@@ -62,7 +64,7 @@ const UserDetail = () => {
                               onClick={() => dispatch(deleteUser())}
                           />
                         </div>
-                    </div> 
+                    </div>
                 </div>
             )}
         </div>

@@ -25,7 +25,10 @@ class MedicinesController < Api::V1::AliasController
 
   # POST /medicines
   def create
-    @medicine = current_user.medicines.new(medicine_params)
+    category_name = params[:category_name]
+    category = current_user.categories.find_or_create_by(name: category_name)
+
+    @medicine = current_user.medicines.new(medicine_params.merge(category_id: category.id))
 
     if @medicine.save
       render json: @medicine, status: :created, location: @medicine
@@ -36,7 +39,10 @@ class MedicinesController < Api::V1::AliasController
 
   # PATCH/PUT /medicines/1
   def update
-    if @medicine.update(medicine_params)
+    category_name = params[:category_name]
+    category = current_user.categories.find_or_create_by(name: category_name)
+
+    if @medicine.update(medicine_params.merge(category_id: category.id))
       render json: @medicine
     else
       render json: @medicine.errors, status: :unprocessable_entity
@@ -57,6 +63,6 @@ class MedicinesController < Api::V1::AliasController
 
     # Only allow a list of trusted parameters through.
     def medicine_params
-      params.require(:medicine).permit(:category_id, :name, :medicine_image, :memo, :ingestion_times_per_day, :ingestion_amount_per_day)
+      params.require(:medicine).permit(:name, :medicine_image, :memo, :ingestion_times_per_day, :ingestion_amount_per_day)
     end
 end

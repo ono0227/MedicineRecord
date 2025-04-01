@@ -1,3 +1,4 @@
 class Post < ApplicationRecord
-    belongs_to :user, :medicine
+    belongs_to :user
+    belongs_to :medicine
 end

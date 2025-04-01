@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import {TextInput, PrimaryButton, UserImageArea} from "../components/UIkit";
+import {TextInput, PrimaryButton } from "../components/UIkit";
 import {signUp} from '../reducks/users/operations';
 import { useDispatch } from "react-redux";
 import { push } from "connected-react-router";
@@ -11,8 +11,7 @@ const SignUp = () => {
     const [username, setUsername] = useState(""),
           [email, setEmail] = useState(""),
           [password, setPassword] = useState(""),
-          [confirmPassword, setComfirmPassword] = useState(""),
-          [userimage, setUserImage] = useState("");
+          [confirmPassword, setComfirmPassword] = useState("");
 
     const inputUsername = useCallback((event) => {
         setUsername(event.target.value)
@@ -34,8 +33,6 @@ const SignUp = () => {
         <div className="c-section-container">
           <h2 className="u-text__headline u-text-center">アカウント登録</h2>
           <div className="module-spacer--medium"/>
-          <UserImageArea userimage={userimage} setUserImage={setUserImage} />
-          <div className="module-spacer--extra-small"/>
           <TextInput
               fullWidth={true} label={"ユーザ名"} multiline={false} required={true}
               rows={1} value={username} type={"text"} onChange={inputUsername}
@@ -56,7 +53,7 @@ const SignUp = () => {
           <div className="center">
             <PrimaryButton
                 label={"アカウントを登録する"}
-                onClick={() => dispatch(signUp(username, email, password, confirmPassword, userimage))}
+                onClick={() => dispatch(signUp(username, email, password, confirmPassword))}
             />
             <p onClick={() => dispatch(push('/signin'))}>アカウントをお持ちの方はこちら</p>
           </div>
