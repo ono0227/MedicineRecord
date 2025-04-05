@@ -6,9 +6,10 @@ Rails.application.routes.draw do
         passwords: "api/v1/auth/passwords",
         sessions: 'api/v1/auth/sessions'
       }
-      resources :categories, only: [:index]
       resources :posts
       resources :medicines
+      resources :categories
+
       get "users/currentuser"
       get "up" => "rails/health#show", as: :rails_health_check
     end

@@ -1,6 +1,8 @@
-import { deletemedicinesAction, fetchmedicinesAction } from "./actions";
+import { deleteMedicinesAction, fetchMedicinesAction, setMedicineNamesAction } from "./actions";
 import { push } from "connected-react-router"
 import axios from 'axios';
+
+const medicinesUrl = process.env.REACT_APP_MEDICINES_URL;
 
 export const fetchMedicines = () => {
     return async(dispatch) => {
@@ -9,18 +11,29 @@ export const fetchMedicines = () => {
                uid = localStorage.getItem('uid');
 
         try {
-            const response = await axios.get(medicineIndexUrl, {
+            const response = await axios.get(medicinesUrl, {
                 headers: {
                     'access-token': accessToken,
                     'client': client,
                     'uid': uid
                 }
             });
-            const medicinesList = response.data;
-            dispatch(fetchmedicinesAction(medicinesList));
+            const medicines = response.data;
+
+            const medicinesList = [];
+            const medicinesByName = {};
+
+            console.log('Raw Medicines Response:', response.data); //検証
+
+            medicines.forEach(medicine => {
+                medicinesList.push(medicine);
+                medicinesByName[medicine.name] = medicine;
+            });
+
+            dispatch(fetchMedicinesAction(medicinesList));
+            dispatch(setMedicineNamesAction(medicinesByName));
         } catch(error) {
                 console.error(' Error Fetch Medicine', error);
-                alert('登録された処方薬の一括取得に失敗しました')
         }
     }
 }
@@ -31,8 +44,10 @@ export const deleteMedicine = (id) => {
                client = localStorage.getItem('client'),
                uid = localStorage.getItem('uid');
 
+        const medicineIdUrl = process.env.REACT_APP_MEDICINES_URL + String(id);
+
         try {
-            await axios.delete(medicineIndexUrl, {
+            await axios.delete(medicineIdUrl, {
                 headers: {
                     'access-token': accessToken,
                     'client': client,
@@ -42,7 +57,7 @@ export const deleteMedicine = (id) => {
             .then(() => {
             const prevMedicines = getState().medicines.list;
             const nextMedicines = prevMedicines.filter(medicine => medicine.id !== id)
-            dispatch(deletemedicinesAction(nextMedicines))
+            dispatch(deleteMedicinesAction(nextMedicines))
             dispatch(push('/medicines/index'))
             })
         } catch(error) {
@@ -52,15 +67,28 @@ export const deleteMedicine = (id) => {
     }
 }
 
-export const createMedicine = (medicineName, medicineImage, memo,
-    ingestionTimesPerDay, ingestionAmountPerDay, categoryName) => {
+export const createMedicine = (medicineName, medicineImage, memo, unit,
+    ingestionTimesPerDay, ingestionAmountEveryTime, categoryName) => {
     return async(dispatch) => {
-        if(medicineName === "" || memo === "" ||
-            ingestionTimesPerDay === "" ||
-            ingestionAmountPerDay === "" ||
-            categoryName === "") {
-            alert("必要項目が未入力です");
-            return false
+        if (medicineName === "") {
+            alert("薬名を入力してください");
+            return false;
+        }
+        if (unit === "") {
+            alert("単位を選択してください");
+            return false;
+        }
+        if (ingestionTimesPerDay === "") {
+            alert("1日の服薬回数を入力してください");
+            return false;
+        }
+        if (ingestionAmountEveryTime === "") {
+            alert("1回の服薬量を入力してください");
+            return false;
+        }
+        if (categoryName === "") {
+            alert("カテゴリーを選択してください");
+            return false;
         }
         if(!medicineImage || !(medicineImage instanceof File)){
             alert("薬の画像が未設定です");
@@ -69,18 +97,21 @@ export const createMedicine = (medicineName, medicineImage, memo,
 
         try {
             const formData = new FormData();
-            formData.append("name", medicineName);
-            formData.append("medicine_image", medicineImage);
-            formData.append("memo", memo);
-            formData.append("ingestion_times_per_day", ingestionTimesPerDay);
-            formData.append("ingestion_amount_per_day", ingestionAmountPerDay);
-            formData.append("category_name", categoryName);
+            formData.append("medicine[name]", medicineName);
+            formData.append("medicine[medicine_image]", medicineImage);
+            if(memo){
+                formData.append("medicine[memo]", memo);
+            }
+            formData.append("medicine[unit]", unit);
+            formData.append("medicine[ingestion_times_per_day]", ingestionTimesPerDay);
+            formData.append("medicine[ingestion_amount_every_time]", ingestionAmountEveryTime);
+            formData.append("medicine[category_name]", categoryName);
 
             const  accessToken = localStorage.getItem('access-token'),
                    client = localStorage.getItem('client'),
                    uid = localStorage.getItem('uid');
 
-            await axios.get(CategoryIndexUrl,formData, {
+            await axios.post(medicinesUrl,formData, {
                 headers: {
                     'access-token': accessToken,
                     'client': client,
@@ -96,15 +127,28 @@ export const createMedicine = (medicineName, medicineImage, memo,
     }
 }
 
-export const updateMedicine = (medicineName, medicineImage, memo,
-    ingestionTimesPerDay, ingestionAmountPerDay, categoryName) => {
+export const updateMedicine = (id, medicineName, medicineImage, memo, unit,
+    ingestionTimesPerDay, ingestionAmountEveryTime, categoryName) => {
     return async(dispatch) => {
-        if(medicineName === "" || memo === "" ||
-            ingestionTimesPerDay === "" ||
-            ingestionAmountPerDay === "" ||
-            categoryName === "") {
-            alert("必要項目が未入力です");
-            return false
+        if (medicineName === "") {
+            alert("薬名を入力してください");
+            return false;
+        }
+        if (unit === "") {
+            alert("単位を選択してください");
+            return false;
+        }
+        if (ingestionTimesPerDay === "") {
+            alert("1日の服薬回数を入力してください");
+            return false;
+        }
+        if (ingestionAmountEveryTime === "") {
+            alert("1回の服薬量を入力してください");
+            return false;
+        }
+        if (categoryName === "") {
+            alert("カテゴリーを選択してください");
+            return false;
         }
         if(!medicineImage && !(medicineImage instanceof File)){
             alert("薬の画像形式が正しくありません");
@@ -113,28 +157,34 @@ export const updateMedicine = (medicineName, medicineImage, memo,
 
         try {
             const formData = new FormData();
-            formData.append("name", medicineName);
+            formData.append("medicine[name]", medicineName);
             if(medicineImage){
-                formData.append("medicine_image", medicineImage);
+                formData.append("medicine[medicine_image]", medicineImage);
             }
-            formData.append("memo", memo);
-            formData.append("ingestion_times_per_day", ingestionTimesPerDay);
-            formData.append("ingestion_amount_per_day", ingestionAmountPerDay);
-            formData.append("category_name", categoryName);
+            if(memo){
+                formData.append("medicine[memo]", memo);
+            }
+            formData.append("medicine[unit]", unit);
+            formData.append("medicine[ingestion_times_per_day]", ingestionTimesPerDay);
+            formData.append("medicine[ingestion_amount_every_time]", ingestionAmountEveryTime);
+            formData.append("medicine[category_name]", categoryName);
 
             const  accessToken = localStorage.getItem('access-token'),
                    client = localStorage.getItem('client'),
                    uid = localStorage.getItem('uid');
 
-            await axios.post(`${medicineUpdateUrl}/${medicineId}`,formData, {
+            const medicineIdUrl = process.env.REACT_APP_MEDICINES_URL + String(id);
+
+            await axios.put(medicineIdUrl, formData, {
                 headers: {
                     'access-token': accessToken,
                     'client': client,
                     'uid': uid,
                     'Content-Type': 'multipart/form-data'
                 }
-            })
-            dispatch(push('/medicine/detail'))
+            });
+
+            dispatch(push('/medicines/' + String(id)))
         } catch(error) {
             console.error(' Error Update Medicine', error);
             alert('処方薬の更新に失敗しました')

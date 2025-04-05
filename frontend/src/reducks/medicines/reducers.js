@@ -14,7 +14,11 @@ export const MedicinesReducer = (state = initialState.medicines, action) => {
                 ...state,
                 list: [...action.payload]
             };
-
+        case Actions.SET_MEDICINE_NAMES:
+            return {
+                ...state,
+                names: action.payload
+            };
         default:
             return state
     }

@@ -1,13 +1,16 @@
-class MedicinesController < Api::V1::AliasController
-  before_action :authenticate_user!, only: [:index, :show, :create, :update, :destroy]
-  before_action :set_medicine, only: %i[ show update destroy ]
+class Api::V1::MedicinesController < Api::V1::AliasController
+  before_action :authenticate_user!, only: [:index, :create, :update, :destroy]
+  before_action :set_medicine, only: %i[ update destroy ]
 
   # GET /medicines_with_category
+  # Api::V1::MedicinesController#index
   def index
-    @medicines = current_user.medicines.all.includes(:category) # N+1問題を避けるため includes を使用
+    @medicines = current_user.medicines.all.includes(:category)
 
     medicines_with_category = @medicines.map do |medicine|
-      medicine.as_json.merge(category_name: medicine.category&.name)
+      category_name = medicine.category&.name || "カテゴリー未設定"
+      unit_value = medicine.unit
+      merged_data = medicine.as_json.merge(category_name: category_name, unit: unit_value || "単位未設定")
     end
 
     render json: medicines_with_category
@@ -19,33 +22,43 @@ class MedicinesController < Api::V1::AliasController
   #end
 
   # GET /medicines/1
-  def show
-    render json: @medicine.as_json(include: :category)
-  end
+  #def show
+  #  render json: @medicine.as_json(include: :category)
+  #end
 
   # POST /medicines
   def create
-    category_name = params[:category_name]
-    category = current_user.categories.find_or_create_by(name: category_name)
+    category_name = params[:medicine][:category_name]
+    category = current_user.categories.find_by(name: category_name)
 
-    @medicine = current_user.medicines.new(medicine_params.merge(category_id: category.id))
+    if category
+      medicine_params_without_category_name = medicine_params.except(:category_name)
+      @medicine = current_user.medicines.new(medicine_params_without_category_name.merge(category_id: category.id))
 
-    if @medicine.save
-      render json: @medicine, status: :created, location: @medicine
+      if @medicine.save
+        render json: @medicine, status: :created
+      else
+        render json: @medicine.errors, status: :unprocessable_entity
+      end
     else
-      render json: @medicine.errors, status: :unprocessable_entity
+      render json: { error: "指定されたカテゴリーが見つかりません" }, status: :not_found
     end
   end
 
   # PATCH/PUT /medicines/1
   def update
-    category_name = params[:category_name]
-    category = current_user.categories.find_or_create_by(name: category_name)
+    category_name = params[:medicine][:category_name]
+    category = current_user.categories.find_by(name: category_name)
 
-    if @medicine.update(medicine_params.merge(category_id: category.id))
-      render json: @medicine
+    if category
+      medicine_params_without_category_name = medicine_params.except(:category_name)
+      if @medicine.update(medicine_params_without_category_name.merge(category_id: category.id))
+        render json: @medicine
+      else
+        render json: @medicine.errors, status: :unprocessable_entity
+      end
     else
-      render json: @medicine.errors, status: :unprocessable_entity
+      render json: { error: "指定されたカテゴリーが見つかりません" }, status: :not_found
     end
   end
 
@@ -63,6 +76,6 @@ class MedicinesController < Api::V1::AliasController
 
     # Only allow a list of trusted parameters through.
     def medicine_params
-      params.require(:medicine).permit(:name, :medicine_image, :memo, :ingestion_times_per_day, :ingestion_amount_per_day)
+      params.require(:medicine).permit(:name, :medicine_image, :memo, :unit, :ingestion_times_per_day, :ingestion_amount_every_time, :category_name)
     end
 end

@@ -1,5 +1,5 @@
 export const DELETE_POST = "DELETE_POST";
-export const deletepostsAction = (posts) => {
+export const deletePostsAction = (posts) => {
     return {
         type: "DELETE_POST",
         payload: posts
@@ -7,9 +7,9 @@ export const deletepostsAction = (posts) => {
 }
 
 export const FETCH_POSTS = "FETCH_POSTS";
-export const fetchpostsAction = (posts) => {
+export const fetchPostsAction = (posts) => {
     return {
-        type: "FETCH_MEDICINES",
+        type: "FETCH_POSTS",
         payload: posts
     }
 }

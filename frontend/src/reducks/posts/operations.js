@@ -1,6 +1,8 @@
-import { deletepostsAction, fetchpostsAction } from "./actions";
+import { deletePostsAction, fetchPostsAction } from "./actions";
 import { push } from "connected-react-router"
 import axios from 'axios';
+
+const postsUrl = process.env.REACT_APP_POSTS_URL;
 
 export const fetchPosts = () => {
     return async(dispatch) => {
@@ -9,18 +11,24 @@ export const fetchPosts = () => {
                uid = localStorage.getItem('uid');
 
         try {
-            const response = await axios.get(postIndexUrl, {
+            const response = await axios.get(postsUrl, {
                 headers: {
                     'access-token': accessToken,
                     'client': client,
                     'uid': uid
                 }
             });
-            const postsList = response.data;
-            dispatch(fetchpostsAction(postsList));
+            const posts = response.data;
+
+            const postsList = []
+
+            posts.forEach(post => {
+                postsList.push(post);
+            });
+
+            dispatch(fetchPostsAction(postsList));
         } catch(error) {
                 console.error(' Error Fetch Posts', error);
-                alert('服薬記録の一括取得に失敗しました')
         }
     }
 }
@@ -31,8 +39,10 @@ export const deletePost = (id) => {
                client = localStorage.getItem('client'),
                uid = localStorage.getItem('uid');
 
+        const postIdUrl = postsUrl + String(id);
+
         try {
-            await axios.delete(postIndexUrl, {
+            await axios.delete(postIdUrl, {
                 headers: {
                     'access-token': accessToken,
                     'client': client,
@@ -42,7 +52,7 @@ export const deletePost = (id) => {
             .then(() => {
             const prevPosts = getState().posts.list;
             const nextPosts = prevPosts.filter(post => post.id !== id)
-            dispatch(deletepostsAction(nextPosts))
+            dispatch(deletePostsAction(nextPosts))
             dispatch(push('/timeline'))
             })
         } catch(error) {
@@ -56,30 +66,22 @@ export const createPost = (ingestionAmount, comment, medicineName,
     medicineImage) => {
     return async(dispatch) => {
         if(ingestionAmount === "") {
-            alert("必要項目が未入力です");
-            return false
-        }
-        if(medicineName === "") {
-            alert("薬の名前が未設定です");
-            return false
-        }
-        if(!medicineImage || !(medicineImage instanceof File)){
-            alert("薬の画像が未設定です");
+            alert("服薬量を入力してください");
             return false
         }
 
         try {
             const formData = new FormData();
-            formData.append("ingestion_amount", ingestionAmount);
-            formData.append("comment", comment);
-            formData.append("medicine_name", medicineName);
-            formData.append("medicine_image", medicineImage);
+            formData.append("post[ingestion_amount]", ingestionAmount);
+            formData.append("post[comment]", comment);
+            formData.append("post[medicine_name]", medicineName);
+            formData.append("post[medicine_image]", medicineImage);
 
             const  accessToken = localStorage.getItem('access-token'),
                    client = localStorage.getItem('client'),
                    uid = localStorage.getItem('uid');
 
-            await axios.get(postIndexUrl,formData, {
+            await axios.post(postsUrl,formData, {
                 headers: {
                     'access-token': accessToken,
                     'client': client,
@@ -95,34 +97,28 @@ export const createPost = (ingestionAmount, comment, medicineName,
     }
 }
 
-export const updatePost = (ingestionAmount, comment, medicineName,
+export const updatePost = (id, ingestionAmount, comment, medicineName,
     medicineImage) => {
     return async(dispatch) => {
         if(ingestionAmount === "") {
-            alert("必要項目が未入力です");
-            return false
-        }
-        if(medicineName === "") {
-            alert("薬の名前が未設定です");
-            return false
-        }
-        if(!medicineImage || !(medicineImage instanceof File)){
-            alert("薬の画像が未設定です");
+            alert("服薬量を入力してください");
             return false
         }
 
         try {
             const formData = new FormData();
-            formData.append("ingestion_amount", ingestionAmount);
-            formData.append("comment", comment);
-            formData.append("medicine_name", medicineName);
-            formData.append("medicine_image", medicineImage);
+            formData.append("post[ingestion_amount]", ingestionAmount);
+            formData.append("post[comment]", comment);
+            formData.append("post[medicine_name]", medicineName);
+            formData.append("post[medicine_image]", medicineImage);
 
             const  accessToken = localStorage.getItem('access-token'),
                    client = localStorage.getItem('client'),
                    uid = localStorage.getItem('uid');
 
-            await axios.get(`${postUpdateUrl}/${postId}`,formData, {
+            const postIdUrl = postsUrl + String(id);
+
+            await axios.put(postIdUrl,formData, {
                 headers: {
                     'access-token': accessToken,
                     'client': client,
@@ -130,7 +126,7 @@ export const updatePost = (ingestionAmount, comment, medicineName,
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            dispatch(push('/post/detail'))
+            dispatch(push('/posts/' + String(id)))
         } catch(error) {
             console.error(' Error Update Post', error);
             alert('投薬記録の更新に失敗しました')
