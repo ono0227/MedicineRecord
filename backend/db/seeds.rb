@@ -7,3 +7,18 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+User.all.each do |user|
+    Category.find_or_create_by(user_id: user.id, name: 'tablet')
+    Category.find_or_create_by(user_id: user.id, name: 'power')
+    Category.find_or_create_by(user_id: user.id, name: 'capsule')
+    Category.find_or_create_by(user_id: user.id, name: 'liquid')
+    Category.find_or_create_by(user_id: user.id, name: 'ointment')
+    Category.find_or_create_by(user_id: user.id, name: 'skin_patch')
+    Category.find_or_create_by(user_id: user.id, name: 'eye_drops')
+    Category.find_or_create_by(user_id: user.id, name: 'nasal_drops')
+    Category.find_or_create_by(user_id: user.id, name: 'ear_drops')
+    Category.find_or_create_by(user_id: user.id, name: 'injection')
+  end
+
+  puts '既存のユーザーに関連付けて基本的なカテゴリーデータを投入しました。'

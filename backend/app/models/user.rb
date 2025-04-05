@@ -9,4 +9,22 @@ class User < ApplicationRecord
 
   has_many :medicines, dependent: :destroy
   has_many :posts, dependent: :destroy
+  has_many :categories, dependent: :destroy
+
+  after_create :create_default_categories
+
+  private
+
+  def create_default_categories
+    Category.create(user_id: id, name: 'tablet')
+    Category.create(user_id: id, name: 'power')
+    Category.create(user_id: id, name: 'capsule')
+    Category.create(user_id: id, name: 'liquid')
+    Category.create(user_id: id, name: 'ointment')
+    Category.create(user_id: id, name: 'skin_patch')
+    Category.create(user_id: id, name: 'eye_drops')
+    Category.create(user_id: id, name: 'nasal_drops')
+    Category.create(user_id: id, name: 'ear_drops')
+    Category.create(user_id: id, name: 'injection')
+  end
 end

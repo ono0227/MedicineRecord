@@ -43,15 +43,15 @@ const UserDetail = () => {
             {userid && (
                 <div className="p-grid__row">
                     {hasUserimage() ? (
-                        <img src={guestuserimage} alt="仮画像" />
+                        <img src={guestuserimage} alt="ゲスト画像" />
                     ) : (
-                        <img src={userimage} alt="ユーザ" />
+                        <img src={userimage} alt="ユーザ画像" />
                     )}
                     <div className={classes.detail}>
                         <div className="module-spacer--small"/>
-                        <p>{username}</p>
+                        <p>ユーザ名：{username}</p>
                         <div className="module-spacer--small"/>
-                        <p>{email}</p>
+                        <p>登録されたメールアドレス：{email}</p>
                         <div className="module-spacer--medium"/>
                         <div className="center">
                           <PrimaryButton

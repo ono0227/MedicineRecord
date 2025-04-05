@@ -44,11 +44,18 @@ export const listenAuthState = () => {
 
 export const signUp = (username, email, password, confirmPassword) => {
     return async(dispatch) => {
-        if (username === "" || email === "" || password === "") {
-            alert("必要項目が未入力です");
-            return false
+        if (username === "" ) {
+            alert("ユーザ名を入力してください");
+            return false;
         }
-
+        if (email === "") {
+            alert("メールアドレスを入力してください");
+            return false;
+        }
+        if (password === "") {
+            alert("パスワードを入力してください");
+            return false;
+        }
         if (password !== confirmPassword) {
             alert("パスワードが一致しません。もう一度お試しください");
             return false
@@ -80,9 +87,13 @@ export const signUp = (username, email, password, confirmPassword) => {
 
 export const signIn = (email, password) => {
     return async(dispatch) => {
-        if(email === "" || password === "") {
-            alert("必要項目が未入力です");
-            return false
+        if (email === "") {
+            alert("メールアドレスを入力してください");
+            return false;
+        }
+        if (password === "") {
+            alert("パスワードを入力してください");
+            return false;
         }
 
         localStorage.clear()
@@ -206,14 +217,19 @@ export const guestSignIn = () => {
 
 export const updateUser = (userimage, username, email) => {
     return async(dispatch) => {
-        if(email === "" || username === "") {
-            alert("必要項目が未入力です");
-            return false
+        if (username === "" ) {
+            alert("ユーザ名を入力してください");
+            return false;
+        }
+        if (email === "") {
+            alert("メールアドレスを入力してください");
+            return false;
         }
         if(!userimage || !(userimage instanceof File)){
             alert("アカウント画像が未設定です");
             return false
         }
+
         try {
             // FormData を作成
             const formData = new FormData();
@@ -251,9 +267,9 @@ export const updateUser = (userimage, username, email) => {
 
 export const sendPasswordURL = (email) => {
     return async(dispatch) => {
-        if(email === "") {
-            alert("必要項目が未入力です");
-            return false
+        if (email === "") {
+            alert("メールアドレスを入力してください");
+            return false;
         }
 
         try {
@@ -274,10 +290,14 @@ export const sendPasswordURL = (email) => {
 
 export const updatePassword = (password, confirmPassword) => {
     return async(dispatch) => {
-        if(password === "" || confirmPassword === "") {
-             alert("必要項目が未入力です");
-             return false
-         }
+        if (password === "") {
+            alert("パスワードを入力してください");
+            return false;
+        }
+        if (password !== confirmPassword) {
+            alert("パスワードが一致しません。もう一度お試しください");
+            return false
+        }
 
          try {
             await axios.put(passwordUrl, {

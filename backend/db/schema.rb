@@ -13,16 +13,19 @@
 ActiveRecord::Schema[7.2].define(version: 2025_03_29_132839) do
   create_table "categories", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
   create_table "medicines", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "medicine_image"
     t.string "memo"
+    t.string "unit"
     t.integer "ingestion_times_per_day"
-    t.integer "ingestion_amount_per_day"
+    t.integer "ingestion_amount_every_time"
     t.bigint "user_id"
     t.bigint "category_id"
     t.datetime "created_at", null: false
@@ -65,6 +68,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_29_132839) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
+  add_foreign_key "categories", "users"
   add_foreign_key "medicines", "categories"
   add_foreign_key "medicines", "users"
   add_foreign_key "posts", "medicines"
