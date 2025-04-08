@@ -1,89 +1,92 @@
-import React, {useEffect, useState} from 'react';
-import {makeStyles} from "@material-ui/styles";
-import {useDispatch, useSelector} from "react-redux";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import { PrimaryButton } from '../components/UIkit';
 import { getMedicines } from "../reducks/medicines/selectors";
-import {returnCodeToBr} from "../helper";
-import { push } from 'connected-react-router';
+import { useNavigate, useParams } from 'react-router-dom';
 import { deleteMedicine, fetchMedicines } from '../reducks/medicines/operations';
+import { styled } from '@mui/material/styles';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
 
-const useStyles = makeStyles((theme) => ({
-    detail: {
-        textAlign: 'left',
-        [theme.breakpoints.down('sm')]: {
-            margin: '0 auto 16px auto',
-            height: 320,
-            width: 320
-        },
-        [theme.breakpoints.up('sm')]: {
-            margin: '0 auto',
-            height: 'auto',
-            width: 400
-        },
-    },
-}))
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(2),
+    margin: theme.spacing(2),
+}));
 
 const MedicineDetail = () => {
-    const classes = useStyles()
-    const dispatch = useDispatch()
-    const selector = useSelector((state) => state)
-    const path = selector.router.location.pathname
-    const id = path.split('/medicines/')[1]
-
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { id } = useParams();
+    const selector = useSelector((state) => state);
     const medicines = getMedicines(selector);
 
-    const [medicineName, setMedicineName] = useState(""),
-          [medicineImage, setMedicineImage] = useState(""),
-          [memo, setMemo] = useState(""),
-          [unit, setUnit] = useState(""),
-          [ingestionTimesPerDay, setIngestionTimesPerDay] = useState(""),
-          [ingestionAmountEveryTime, setIngestionAmountEveryTime] = useState(""),
-          [categoryName, setCategoryName] = useState("");
+    const [medicineName, setMedicineName] = useState("");
+    const [medicineImage, setMedicineImage] = useState("");
+    const [memo, setMemo] = useState("");
+    const [unit, setUnit] = useState("");
+    const [ingestionTimesPerDay, setIngestionTimesPerDay] = useState("");
+    const [ingestionAmountEveryTime, setIngestionAmountEveryTime] = useState("");
+    const [categoryName, setCategoryName] = useState("");
 
     useEffect(() => {
-        dispatch(fetchMedicines())
+        dispatch(fetchMedicines());
     }, [dispatch]);
 
-     useEffect(() => {
+    useEffect(() => {
         const targetMedicine = medicines.find(medicine => String(medicine.id) === id);
-            if (targetMedicine) {
-                setMedicineName(targetMedicine.name);
-                setMedicineImage(targetMedicine.medicine_image)
-                setMemo(targetMedicine.memo);
-                setUnit(targetMedicine.unit);
-                setIngestionTimesPerDay(String(targetMedicine.ingestion_times_per_day));
-                setIngestionAmountEveryTime(String(targetMedicine.ingestion_amount_every_time));
-                setCategoryName(targetMedicine.category_name);
-            }
-        }, [id, medicines, setMedicineName, setMemo, setUnit, setIngestionTimesPerDay, setIngestionAmountEveryTime, setCategoryName]);
+        if (targetMedicine) {
+            setMedicineName(targetMedicine.name);
+            setMedicineImage(targetMedicine.medicine_image);
+            setMemo(targetMedicine.memo);
+            setUnit(targetMedicine.unit);
+            setIngestionTimesPerDay(String(targetMedicine.ingestion_times_per_day));
+            setIngestionAmountEveryTime(String(targetMedicine.ingestion_amount_every_time));
+            setCategoryName(targetMedicine.category_name);
+        }
+    }, [id, medicines, setMedicineName, setMedicineImage, setMemo, setUnit, setIngestionTimesPerDay, setIngestionAmountEveryTime, setCategoryName]);
+
+    const handleDeleteMedicine = () => {
+        dispatch(deleteMedicine(id));
+        navigate('/medicines/index');
+    };
 
     return (
-        <section className="c-section-wrapin">
-            <div className="p-grid__row">
-                <img src={medicineImage} alt="薬の画像"/>
-                <div className={classes.detail}>
-                    <h2 className="u-text__headline">薬の名前：{medicineName}</h2>
-                    <p>カテゴリー名：{categoryName}</p>
-                    <p>1日の服薬回数：{ingestionTimesPerDay}</p>
-                    <p>1回の服薬量：{ingestionAmountEveryTime}</p>
-                    <p>単位：{unit}</p>
-                    <div className="module-spacer--small"/>
-                    <p>メモ：{returnCodeToBr(memo)}</p>
-                </div>
-                <div className="module-spacer--small"/>
-                <div className="center">
-                    <PrimaryButton
-                        label={"薬情報を編集"}
-                        onClick={() => dispatch(push('/medicines/edit/' + String(id)))}
-                    />
-                    <div className="module-spacer--medium"/>
-                    <PrimaryButton
-                        label={"薬情報を削除"}
-                        onClick={() => dispatch(deleteMedicine(id))}
-                    />
-                    </div>
-                </div>
-        </section>
+        <Container maxWidth="md">
+            <Box sx={{ mt: 4 }}>
+                <Typography variant="h4" gutterBottom>薬の詳細</Typography>
+                <StyledPaper>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={4}>
+                            {medicineImage && (
+                                <img src={medicineImage} alt="薬の画像" style={{ maxWidth: '100%', height: 'auto' }} />
+                            )}
+                        </Grid>
+                        <Grid item xs={12} md={8}>
+                            <Typography variant="h6">薬の名前：{medicineName}</Typography>
+                            <Typography variant="subtitle1" color="textSecondary">カテゴリー名：{categoryName}</Typography>
+                            <Typography variant="body1">1日の服薬回数：{ingestionTimesPerDay}</Typography>
+                            <Typography variant="body1">1回の服薬量：{ingestionAmountEveryTime} {unit}</Typography>
+                            <Typography variant="body2" style={{ whiteSpace: 'pre-line' }}>メモ：{memo}</Typography>
+                            <Box sx={{ mt: 2 }}>
+                                <PrimaryButton
+                                    label={"薬情報を編集"}
+                                    onClick={() => navigate(`/medicines/edit/${id}`)}
+                                    sx={{ mr: 2 }}
+                                />
+                                <PrimaryButton
+                                    label={"薬情報を削除"}
+                                    onClick={handleDeleteMedicine}
+                                    color="error"
+                                />
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </StyledPaper>
+            </Box>
+        </Container>
     );
 };
 

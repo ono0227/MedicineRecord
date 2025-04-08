@@ -1,33 +1,39 @@
 import React from "react";
-import { Route, Switch } from 'react-router';
+import { Routes, Route } from 'react-router-dom';
 import { TopPage, TimeLine, SignUp, SignIn, UserDetail, UserEdit,
          ResetPassword, UpdatePassword,
          MedicinesIndex, MedicineDetail,MedicineEdit, MedicineCreate,
-         PostDetail, PostEdit, PostCreate
+         PostDetail, PostEdit, PostCreate,
+         BarGraph,
+         Calendar
          } from "./templates";
+import { InquiryForm, TermsOfService, PrivacyPolicy } from "./components/Footer";
 import Auth from './Auth';
 
 const Router = () => {
     return (
-        <Switch>
-            <Route exact path="(/)?" component={TopPage} />
-            <Route exact path="/signin" component={SignIn} />
-            <Route exact path="/signup" component={SignUp} />
-            <Route exact path="/password/reset" component={ResetPassword} />
-            <Route exact path="/password/update" component={UpdatePassword} />
-            <Auth>
-                <Route exact path="/timeline" component={TimeLine} />
-                <Route exact path="/posts/:id" component={PostDetail} />
-                <Route exact path="/posts/edit/:id" component={PostEdit} />
-                <Route exact path="/posts/create" component={PostCreate} />
-                <Route exact path="/users/detail" component={UserDetail} />
-                <Route exact path="/users/edit" component={UserEdit} />
-                <Route exact path="/medicines/index" component={MedicinesIndex} />
-                <Route exact path="/medicines/:id" component={MedicineDetail} />
-                <Route exact path="/medicines/edit/:id" component={MedicineEdit} />
-                <Route exact path="/medicines/create" component={MedicineCreate} />
-            </Auth>
-        </Switch>
+        <Routes>
+            <Route path="/" element={<TopPage />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/password/reset" element={<ResetPassword />} />
+            <Route path="/password/update" element={<UpdatePassword />} />
+            <Route path="/termsofservice" element={<TermsOfService />} />
+            <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+            <Route path="/inquiryform" element={<InquiryForm />} />
+            <Route path="/timeline" element={<Auth><TimeLine /></Auth>} />
+            <Route path="/posts/:id" element={<Auth><PostDetail /></Auth>} />
+            <Route path="/posts/edit/:id" element={<Auth><PostEdit /></Auth>} />
+            <Route path="/posts/create" element={<Auth><PostCreate /></Auth>} />
+            <Route path="/users/detail" element={<Auth><UserDetail /></Auth>} />
+            <Route path="/users/edit" element={<Auth><UserEdit /></Auth>} />
+            <Route path="/medicines/index" element={<Auth><MedicinesIndex /></Auth>} />
+            <Route path="/medicines/:id" element={<Auth><MedicineDetail /></Auth>} />
+            <Route path="/medicines/edit/:id" element={<Auth><MedicineEdit /></Auth>} />
+            <Route path="/medicines/create" element={<Auth><MedicineCreate /></Auth>} />
+            <Route path="/bargraph" element={<Auth><BarGraph /></Auth>} />
+            <Route path="/calendar" element={<Auth><Calendar /></Auth>} />
+        </Routes>
     )
 }
 

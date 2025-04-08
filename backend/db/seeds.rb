@@ -8,6 +8,7 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+#ユーザ毎にcategoriesテーブルにカテゴリー名のデータを投入
 User.all.each do |user|
     Category.find_or_create_by(user_id: user.id, name: 'tablet')
     Category.find_or_create_by(user_id: user.id, name: 'power')

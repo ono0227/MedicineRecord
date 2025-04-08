@@ -7,15 +7,15 @@ const Input = styled('input')({
     display: 'none',
 });
 
-const MedicineImageArea = (props) => {
-    const { medicineImage, setMedicineImage } = props;
-    const [preview, setPreview] = useState(medicineImage?.path || "");
+const UserImageArea = (props) => {
+    const { userImage, setUserImage} = props;
+    const [preview, setPreview] = useState(userImage?.path || "");
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-            setPreview(URL.createObjectURL(file)); //プレビュー表示させる画像を設定
-            setMedicineImage(file); //登録、更新に使う画像を設定
+            setPreview(URL.createObjectURL(file)); // プレビュー表示させる画像を設定
+            setUserImage(file); // 登録、更新に使う画像を設定
         }
     };
 
@@ -37,4 +37,4 @@ const MedicineImageArea = (props) => {
     );
 };
 
-export default MedicineImageArea;
+export default UserImageArea;

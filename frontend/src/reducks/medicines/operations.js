@@ -1,5 +1,4 @@
 import { deleteMedicinesAction, fetchMedicinesAction, setMedicineNamesAction } from "./actions";
-import { push } from "connected-react-router"
 import axios from 'axios';
 
 const medicinesUrl = process.env.REACT_APP_MEDICINES_URL;
@@ -22,8 +21,6 @@ export const fetchMedicines = () => {
 
             const medicinesList = [];
             const medicinesByName = {};
-
-            console.log('Raw Medicines Response:', response.data); //検証
 
             medicines.forEach(medicine => {
                 medicinesList.push(medicine);
@@ -58,7 +55,6 @@ export const deleteMedicine = (id) => {
             const prevMedicines = getState().medicines.list;
             const nextMedicines = prevMedicines.filter(medicine => medicine.id !== id)
             dispatch(deleteMedicinesAction(nextMedicines))
-            dispatch(push('/medicines/index'))
             })
         } catch(error) {
                 console.error(' Error Delete Medicine', error);
@@ -96,6 +92,7 @@ export const createMedicine = (medicineName, medicineImage, memo, unit,
         }
 
         try {
+             // FormDataオブジェクトに変換
             const formData = new FormData();
             formData.append("medicine[name]", medicineName);
             formData.append("medicine[medicine_image]", medicineImage);
@@ -111,6 +108,7 @@ export const createMedicine = (medicineName, medicineImage, memo, unit,
                    client = localStorage.getItem('client'),
                    uid = localStorage.getItem('uid');
 
+            // FormDataオブジェクトとして送信
             await axios.post(medicinesUrl,formData, {
                 headers: {
                     'access-token': accessToken,
@@ -119,7 +117,6 @@ export const createMedicine = (medicineName, medicineImage, memo, unit,
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            dispatch(push('/medicines/index'))
         } catch(error) {
             console.error(' Error Register Medicine', error);
             alert('処方薬の登録に失敗しました')
@@ -156,6 +153,7 @@ export const updateMedicine = (id, medicineName, medicineImage, memo, unit,
         }
 
         try {
+             // FormDataオブジェクトに変換
             const formData = new FormData();
             formData.append("medicine[name]", medicineName);
             if(medicineImage){
@@ -175,6 +173,7 @@ export const updateMedicine = (id, medicineName, medicineImage, memo, unit,
 
             const medicineIdUrl = process.env.REACT_APP_MEDICINES_URL + String(id);
 
+            // FormDataオブジェクトとして送信
             await axios.put(medicineIdUrl, formData, {
                 headers: {
                     'access-token': accessToken,
@@ -183,8 +182,6 @@ export const updateMedicine = (id, medicineName, medicineImage, memo, unit,
                     'Content-Type': 'multipart/form-data'
                 }
             });
-
-            dispatch(push('/medicines/' + String(id)))
         } catch(error) {
             console.error(' Error Update Medicine', error);
             alert('処方薬の更新に失敗しました')
