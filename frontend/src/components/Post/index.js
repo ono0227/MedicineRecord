@@ -1,1 +1,1 @@
-export {default as PostSummary} from './PostSummary'
+export {default as Post} from './Post';
