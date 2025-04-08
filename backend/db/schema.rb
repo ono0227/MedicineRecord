@@ -35,7 +35,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_29_132839) do
   end
 
   create_table "posts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "ingestion_amount"
+    t.integer "ingestion_amount"
     t.string "comment"
     t.bigint "user_id"
     t.bigint "medicine_id"

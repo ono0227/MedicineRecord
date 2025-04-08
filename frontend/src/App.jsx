@@ -1,9 +1,11 @@
 import React from 'react';
-import Router from './Router'
+import Router from './Router';
 import { Header } from './components/Header';
-import {Footer, ScrollToTop} from './components/UIkit'
-import "./assets/reset.css"
-import "./assets/style.css"
+import { ScrollToTop } from './components/UIkit';
+import { Footer } from './components/Footer';
+import backgroundimage from './assets/img/backgroundimage.jpeg';
+import './assets/reset.css';
+import './assets/style.css';
 
 const App = () => {
   return (
@@ -11,7 +13,16 @@ const App = () => {
       <ScrollToTop />
       <Header />
       <main className="c-main">
-        <Router />
+        <div
+          style={{
+            backgroundImage: `url(${backgroundimage})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            minHeight: '100vh',
+          }}
+        >
+          <Router />
+        </div>
       </main>
       <Footer />
     </>

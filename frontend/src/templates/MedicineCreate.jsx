@@ -1,15 +1,23 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { PrimaryButton, SelectBox, TextInput } from "../components/UIkit";
+import { PrimaryButton, TextInput } from "../components/UIkit";
 import { useDispatch, useSelector } from "react-redux";
-import MedicineImageArea from '../components/Medicine/MedicineImageArea';
-import { getCategories } from "../reducks/categories/selectors"; // 新しい selector をインポート
-import { fetchCategories } from "../reducks/categories/operations"; // 新しいオペレーションをインポート
+import { MedicineImageArea } from '../components/Medicine';
+import { getCategories } from "../reducks/categories/selectors";
+import { fetchCategories } from "../reducks/categories/operations";
 import { createMedicine } from "../reducks/medicines/operations";
+import { useNavigate } from 'react-router-dom';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 const MedicineCreate = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const selector = useSelector((state) => state)
-
     const categories = getCategories(selector);
 
     const [medicineName, setMedicineName] = useState(""),
@@ -21,84 +29,109 @@ const MedicineCreate = () => {
           [categoryName, setCategoryName] = useState("");
 
     const inputMedicineName = useCallback((event) => {
-        setMedicineName(event.target.value)
-    }, [setMedicineName])
+        setMedicineName(event.target.value);
+    }, [setMedicineName]);
 
     const inputMemo = useCallback((event) => {
-        setMemo(event.target.value)
-    }, [setMemo])
+        setMemo(event.target.value);
+    }, [setMemo]);
 
     const inputIngestionTimesPerDay = useCallback((event) => {
-        setIngestionTimesPerDay(event.target.value)
-    }, [setIngestionTimesPerDay])
+        setIngestionTimesPerDay(event.target.value);
+    }, [setIngestionTimesPerDay]);
 
     const inputIngestionAmountEveryTime = useCallback((event) => {
-        setIngestionAmountEveryTime(event.target.value)
-    }, [setIngestionAmountEveryTime])
+        setIngestionAmountEveryTime(event.target.value);
+    }, [setIngestionAmountEveryTime]);
+
+    const handleCategoryChange = (event) => {
+        setCategoryName(event.target.value);
+    };
+
+    const handleUnitChange = (event) => {
+        setUnit(event.target.value);
+    };
 
     useEffect(() => {
         dispatch(fetchCategories());
     }, [dispatch]);
 
-    const categoryOptions = categories ? categories.map((category) => ({
-        label: category.name,
-        value: category.name,
-        key: category.id
-    })) : [];
+    const categoryOptions = categories ? categories.map((category) => (
+        <MenuItem key={category.id} value={category.name}>
+            {category.name}
+        </MenuItem>
+    )) : [];
 
     const unitOptions = [
-        { label: 'g', value: 'g', key: 'g' },
-        { label: 'mg', value: 'mg', key: 'mg' },
-        { label: '錠', value: '錠', key: '錠' },
-        { label: '枚', value: '枚', key: '枚' },
-        { label: 'ml', value: 'ml', key: 'ml' }
+        <MenuItem key="g" value="g">g</MenuItem>,
+        <MenuItem key="mg" value="mg">mg</MenuItem>,
+        <MenuItem key="錠" value="錠">錠</MenuItem>,
+        <MenuItem key="枚" value="枚">枚</MenuItem>,
+        <MenuItem key="ml" value="ml">ml</MenuItem>
     ];
 
+    const handleCreateMedicine = () => {
+        dispatch(createMedicine(medicineName, medicineImage, memo, unit, ingestionTimesPerDay, ingestionAmountEveryTime, categoryName));
+        navigate('/medicines/index');
+    };
+
     return (
-        <div>
-            <h2>薬を作成する</h2>
-            <section>
-                <h2 className="u-text_headline u-text-center">薬の登録</h2>
-                <div className="c-section-container">
-                    <MedicineImageArea medicineImage={medicineImage} setMedicineImage={setMedicineImage} />
-                    <TextInput
-                        fullWidth={true} label={"薬名"} multiline={false} required={true}
-                        onChange={inputMedicineName} rows={1} value={medicineName} type={"text"}
+        <Container maxWidth="sm">
+            <Box sx={{ mt: 4 }}>
+                <Typography variant="h4" gutterBottom>薬を登録</Typography>
+                <MedicineImageArea medicineImage={medicineImage} setMedicineImage={setMedicineImage}/>
+                <TextInput
+                    fullWidth label={"薬名"} multiline={false} required={true}
+                    onChange={inputMedicineName} rows={1} value={medicineName} type={"text"}
+                    sx={{ mt: 2 }}
+                />
+                <TextInput
+                    fullWidth label={"メモ"} multiline={true} required={false}
+                    onChange={inputMemo} rows={5} value={memo} type={"text"}
+                    sx={{ mt: 2 }}
+                />
+                <FormControl fullWidth required sx={{ mt: 2 }}>
+                    <InputLabel id="category-label">カテゴリー</InputLabel>
+                    <Select
+                        labelId="category-label"
+                        id="category"
+                        value={categoryName}
+                        label="カテゴリー"
+                        onChange={handleCategoryChange}
+                    >
+                        {categoryOptions}
+                    </Select>
+                </FormControl>
+                <TextInput
+                    fullWidth label={"1日の服薬回数"} multiline={false} required={true}
+                    onChange={inputIngestionTimesPerDay} rows={1} value={ingestionTimesPerDay} type={"number"}
+                    sx={{ mt: 2 }}
+                />
+                <TextInput
+                    fullWidth label={"1回の服薬量"} multiline={false} required={true}
+                    onChange={inputIngestionAmountEveryTime} rows={1} value={ingestionAmountEveryTime} type={"number"}
+                    sx={{ mt: 2 }}
+                />
+                <FormControl fullWidth required sx={{ mt: 2 }}>
+                    <InputLabel id="unit-label">単位</InputLabel>
+                    <Select
+                        labelId="unit-label"
+                        id="unit"
+                        value={unit}
+                        label="単位"
+                        onChange={handleUnitChange}
+                    >
+                        {unitOptions}
+                    </Select>
+                </FormControl>
+                <Box sx={{ mt: 3 }}>
+                    <PrimaryButton
+                        label={"薬を登録"}
+                        onClick={handleCreateMedicine}
                     />
-
-                    <TextInput
-                        fullWidth={true} label={"メモ"} multiline={true} required={false}
-                        onChange={inputMemo} rows={5} value={memo} type={"text"}
-                    />
-
-                    <SelectBox
-                        label={"カテゴリー"} required={true} options={categoryOptions} select={setCategoryName} value={categoryName}
-                    />
-
-                    <TextInput
-                        fullWidth={true} label={"1日の服薬回数"} multiline={false} required={true}
-                        onChange={inputIngestionTimesPerDay} rows={1} value={ingestionTimesPerDay} type={"number"}
-                    />
-
-                    <TextInput
-                        fullWidth={true} label={"1回の服薬量"} multiline={false} required={true}
-                        onChange={inputIngestionAmountEveryTime} rows={1} value={ingestionAmountEveryTime} type={"number"}
-                    />
-
-                    <SelectBox
-                        label={"単位"} required={true} options={unitOptions} select={setUnit} value={unit}
-                    />
-
-                    <div className="module-spacer--small"/>
-                    <div className="center">
-                        <PrimaryButton
-                            label={"薬を登録"}
-                            onClick={() => dispatch(createMedicine(medicineName, medicineImage, memo, unit, ingestionTimesPerDay, ingestionAmountEveryTime, categoryName))}
-                        />
-                    </div>
-                </div>
-            </section>
-    </div>
+                </Box>
+            </Box>
+        </Container>
     );
 };
 

@@ -1,19 +1,26 @@
-import React from "react";
-import TextField from "@material-ui/core/TextField";
+import React from 'react';
+import TextField from '@mui/material/TextField';
+import { styled } from '@mui/material/styles';
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+    margin: theme.spacing(1),
+}));
 
 const TextInput = (props) => {
+    const { label, multiline, rows, value, type, onChange, required, fullWidth } = props;
     return (
-        <TextField
-            fullWidth={props.fullWidth}
-            label={props.label}
-            multiline={props.multiline}
-            required={props.required}
-            row={props.row}
-            value={props.value}
-            type={props.type}
-            onChange={props.onChange}
+        <StyledTextField
+            label={label}
+            multiline={multiline}
+            rows={rows}
+            value={value}
+            type={type}
+            onChange={onChange}
+            required={required}
+            fullWidth={fullWidth}
+            variant="outlined"
         />
-    )
-}
+    );
+};
 
 export default TextInput;

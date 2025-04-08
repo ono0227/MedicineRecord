@@ -1,80 +1,86 @@
 import React from "react";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
+import { styled } from "@mui/material/styles";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
 import { getIsSignedIn, getUserImage, getUserName } from "../../reducks/users/selectors";
-import {push} from "connected-react-router";
 import { useDispatch, useSelector } from "react-redux";
 import HeaderMenu from "./HeaderMenu";
 import { PrimaryButton } from "../UIkit";
 import { guestSignIn } from "../../reducks/users/operations";
 import logo from "../../assets/img/logo.jpg";
-import { makeStyles } from "@material-ui/core";
+import Box from '@mui/material/Box';
+import { useNavigate } from 'react-router-dom';
 
-const useStyles = makeStyles({
-    root: {
-        flexGrow: 1,
-    },
-    menuBar: {
-        backgroundColor: "#06D8F8",
-    },
-    toolBar: {
-        margin: "0 auto",
-        maxWidth: 1024,
-        width: "100%",
-    },
-    iconButtons: {
-        margin: "0 0 0 auto",
-    }
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+    backgroundColor: "#06D8F8",
+}));
+
+const StyledToolbar = styled(Toolbar)(({ theme }) => ({
+    margin: "0 auto",
+    maxWidth: 1024,
+    width: "100%",
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+}));
+
+const LogoImage = styled('img')({
+    cursor: 'pointer',
+    height: '40px',
 });
 
 const Header = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const selector = useSelector((state) => state);
     const isSignedIn = getIsSignedIn(selector),
-          userimage = getUserImage(selector),
-          username = getUserName(selector);
-
-    const classes = useStyles();
+        userimage = getUserImage(selector),
+        username = getUserName(selector);
 
     const handleLogoClick = () => {
-        if(isSignedIn){
-            dispatch(push('/timeline'))
+        if (isSignedIn) {
+            navigate('/timeline');
         } else {
-            dispatch(push('/'))
+            navigate('/');
         }
-    }
+    };
+
+    const handleGuestSignIn = () => {
+        dispatch(guestSignIn());
+        navigate('/timeline');
+    };
 
     return (
-        <div className={classes.root}>
-          <AppBar position="fixed" className={classes.menuBar}>
-              <Toolbar className={classes.toolBar}>
-                  <img src={logo} alt="サイトロゴ" width="50px" 
-                    onClick={handleLogoClick}/>
-                  {!isSignedIn && (
-                    <div className="p-grid__row">
-                      <PrimaryButton
-                        label={"新規登録"}
-                        onClick={() => dispatch(push('/signup'))}
-                      />
-                      <PrimaryButton
-                        label={"ゲストログイン"}
-                        onClick={() => dispatch((guestSignIn()))}
-                      />
-                      <PrimaryButton
-                        label={"ログイン"}
-                        onClick={() => dispatch(push('/signin'))}
-                      />
-                    </div>
-                  )}
-                  {isSignedIn && (
-                    <div className={classes.iconButtons}>
-                      <HeaderMenu userimage={userimage} username={username} />
-                    </div>
-                  )}
-              </Toolbar>
-          </AppBar>
-        </div>
-    )
-}
+        <Box sx={{ flexGrow: 1 }}>
+            <StyledAppBar position="fixed">
+                <StyledToolbar>
+                    <LogoImage src={logo} alt="サイトロゴ" onClick={handleLogoClick} />
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {!isSignedIn && (
+                            <>
+                                <PrimaryButton
+                                    label={"新規登録"}
+                                    onClick={() => navigate('/signup')}
+                                />
+                                <PrimaryButton
+                                    label={"ゲストログイン"}
+                                    onClick={handleGuestSignIn}
+                                />
+                                <PrimaryButton
+                                    label={"ログイン"}
+                                    onClick={() => navigate('/signin')}
+                                />
+                            </>
+                        )}
+                        {isSignedIn && (
+                            <HeaderMenu userimage={userimage} username={username} />
+                        )}
+                    </Box>
+                </StyledToolbar>
+            </StyledAppBar>
+            <Toolbar />
+        </Box>
+    );
+};
 
-export default Header
+export default Header;

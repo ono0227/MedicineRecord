@@ -11,10 +11,12 @@ class User < ApplicationRecord
   has_many :posts, dependent: :destroy
   has_many :categories, dependent: :destroy
 
+  #レコードがデータベースに保村された後に実行
   after_create :create_default_categories
 
   private
 
+  #categoriesテーブルにデフォルトのカテゴリー名を作成
   def create_default_categories
     Category.create(user_id: id, name: 'tablet')
     Category.create(user_id: id, name: 'power')

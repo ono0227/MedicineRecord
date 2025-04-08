@@ -1,5 +1,4 @@
 import { deletePostsAction, fetchPostsAction } from "./actions";
-import { push } from "connected-react-router"
 import axios from 'axios';
 
 const postsUrl = process.env.REACT_APP_POSTS_URL;
@@ -53,7 +52,6 @@ export const deletePost = (id) => {
             const prevPosts = getState().posts.list;
             const nextPosts = prevPosts.filter(post => post.id !== id)
             dispatch(deletePostsAction(nextPosts))
-            dispatch(push('/timeline'))
             })
         } catch(error) {
                 console.error(' Error Delete Post', error);
@@ -71,6 +69,7 @@ export const createPost = (ingestionAmount, comment, medicineName,
         }
 
         try {
+            // FormDataオブジェクトに変換
             const formData = new FormData();
             formData.append("post[ingestion_amount]", ingestionAmount);
             formData.append("post[comment]", comment);
@@ -81,6 +80,7 @@ export const createPost = (ingestionAmount, comment, medicineName,
                    client = localStorage.getItem('client'),
                    uid = localStorage.getItem('uid');
 
+            // FormDataオブジェクトとして送信
             await axios.post(postsUrl,formData, {
                 headers: {
                     'access-token': accessToken,
@@ -89,7 +89,6 @@ export const createPost = (ingestionAmount, comment, medicineName,
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            dispatch(push('/timeline'))
         } catch(error) {
             console.error(' Error Register Post', error);
             alert('投薬記録の投稿に失敗しました')
@@ -106,6 +105,7 @@ export const updatePost = (id, ingestionAmount, comment, medicineName,
         }
 
         try {
+            // FormDataオブジェクトに変換
             const formData = new FormData();
             formData.append("post[ingestion_amount]", ingestionAmount);
             formData.append("post[comment]", comment);
@@ -118,6 +118,7 @@ export const updatePost = (id, ingestionAmount, comment, medicineName,
 
             const postIdUrl = postsUrl + String(id);
 
+            // FormDataオブジェクトとして送信
             await axios.put(postIdUrl,formData, {
                 headers: {
                     'access-token': accessToken,
@@ -126,7 +127,6 @@ export const updatePost = (id, ingestionAmount, comment, medicineName,
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            dispatch(push('/posts/' + String(id)))
         } catch(error) {
             console.error(' Error Update Post', error);
             alert('投薬記録の更新に失敗しました')

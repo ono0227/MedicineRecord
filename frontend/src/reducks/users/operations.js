@@ -1,5 +1,4 @@
 import { signInAction, signOutAction } from "./actions";
-import { push } from "connected-react-router";
 import axios from 'axios';
 
 const authUrl = process.env.REACT_APP_AUTH_URL,
@@ -37,7 +36,6 @@ export const listenAuthState = () => {
                     alert('ユーザ認証に失敗しました')
                 });
         } else {
-            dispatch(push('/'))
         }
     }
 }
@@ -77,7 +75,6 @@ export const signUp = (username, email, password, confirmPassword) => {
             localStorage.setItem('client', client)
             localStorage.setItem('uid', uid)
 
-            dispatch(push('/timeline'));
         } catch(error) {
             console.error('Can not sign up', error);
             alert('サインアップに失敗しました。もう一度お試しください')
@@ -120,7 +117,6 @@ export const signIn = (email, password) => {
                 email: response.data.data.email,
                 userimage: response.data.data.image
             }))
-            dispatch(push('/timeline'))
         } catch(error) {
             console.error('Can not sign in', error);
             alert('サインインできませんでした。もう一度お試しください')
@@ -143,7 +139,6 @@ export const signOut = () => {
         }).then(() => {
             localStorage.clear()
             dispatch(signOutAction())
-            dispatch(push('/'))
         }).catch(error => {
             console.error(' Error Sign out', error);
             alert('サインアウトに失敗しました')
@@ -167,7 +162,6 @@ export const deleteUser = () => {
         }).then(() => {
             localStorage.clear()
             dispatch(signOutAction())
-            dispatch(push('/'))
         }).catch(error => {
             console.error(' Error Sign out', error);
             alert('アカウント削除に失敗しました')
@@ -206,8 +200,6 @@ export const guestSignIn = () => {
             localStorage.setItem('client', client);
             localStorage.setItem('uid', uid);
 
-            dispatch(push('/timeline'))
-
         } catch(error) {
             console.error('Can not guest sign in', error);
             alert('ゲストサインインできませんでした。もう一度お試しください')
@@ -231,13 +223,13 @@ export const updateUser = (userimage, username, email) => {
         }
 
         try {
-            // FormData を作成
+            // FormDataオブジェクトに変換
             const formData = new FormData();
             formData.append("name", username);
             formData.append("email", email);
             formData.append("image", userimage);
 
-            // PUT リクエストを送信
+            // FormDataオブジェクトとして送信
             const response = await axios.put(authUrl, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -247,17 +239,13 @@ export const updateUser = (userimage, username, email) => {
                 }
             });
 
-            // レスポンスを Redux に保存
             dispatch(signInAction({
                 isSignedIn: true,
                 uid: response.data.data.uid,
                 username: response.data.data.name,
                 email: response.data.data.email,
-                // userimage: response.data.data.image
-                userimage: `http://localhost:3000${response.data.data.image}`
+                userimage: response.data.data.image
             }))
-            dispatch(push('/users/detail'))
-
         } catch(error) {
             console.error('Can not update user', error);
             alert('ユーザ情報を更新できませんでした。もう一度お試しください')
@@ -279,8 +267,6 @@ export const sendPasswordURL = (email) => {
             })
 
             alert("パスワード再設定用リンクをご登録のメールアドレスにお送りしました")
-            dispatch(push('/'))
-
         }catch(error) {
             console.error('Can not send link', error);
             alert('パスワード再設定用リンクを送信できませんでした。もう一度お試しください')
@@ -304,9 +290,6 @@ export const updatePassword = (password, confirmPassword) => {
                 password: password,
                 password_confirmation: confirmPassword
             })
-
-            dispatch(push('/signin'))
-
         }catch(error) {
             console.error('Can not reset password', error);
             alert('パスワードを更新できませんでした。もう一度お試しください')

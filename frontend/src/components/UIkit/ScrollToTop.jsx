@@ -1,24 +1,22 @@
 import { useEffect } from 'react';
-import {useSelector} from "react-redux";
+import { useLocation } from 'react-router-dom';
 
 const ScrollToTop = () => {
-    const selector = useSelector((state) => state);
-    const pathname = selector.router.location.pathname
-    const search = selector.router.location.search
+  const location = useLocation();
 
-    useEffect(() => {
-        try {
-            window.scroll({
-                top: 0,
-                left: 0,
-                behavior: 'smooth',
-            });
-        } catch (error) {
-            window.scrollTo(0, 0);
-        }
-    }, [pathname, search]);
+  useEffect(() => {
+    try {
+      window.scroll({
+        top: 0,
+        left: 0,
+        behavior: 'smooth',
+      });
+    } catch (error) {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, location.search]);
 
-    return null;
+  return null;
 };
 
-export default ScrollToTop
+export default ScrollToTop;
