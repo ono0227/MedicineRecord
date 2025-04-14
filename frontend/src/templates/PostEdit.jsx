@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { PrimaryButton, TextInput } from "../components/UIkit";
 import { useDispatch, useSelector } from "react-redux";
-import { updatePost } from "../reducks/posts/operations";
+import { updatePost, fetchPosts } from "../reducks/posts/operations";
 import { getPosts } from "../reducks/posts/selectors";
 import { Paper, Grid, Typography, Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -32,6 +32,10 @@ const PostEdit = () => {
     const inputComment = useCallback((event) => {
         setComment(event.target.value);
     }, [setComment]);
+
+    useEffect(() => {
+        dispatch(fetchPosts());
+    }, [dispatch]);
 
     useEffect(() => {
         const targetPost = posts.find(post => String(post.id) === id);

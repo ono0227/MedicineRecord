@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteUser } from "../reducks/users/operations";
 import { getEmail, getUserId, getUserImage, getUserName } from "../reducks/users/selectors";
 import { styled } from "@mui/material/styles";
-import guestuserimage from "../assets/img/guestuserimage.png";
+import guestUserImage from "../assets/img/guest_user_image.png";
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -50,7 +50,7 @@ const UserDetail = () => {
                             <Grid item>
                                 <Avatar
                                     alt={username}
-                                    src={hasUserimage() ? guestuserimage : userimage}
+                                    src={hasUserimage() ? guestUserImage : userimage}
                                     sx={{ width: 80, height: 80 }}
                                 />
                             </Grid>

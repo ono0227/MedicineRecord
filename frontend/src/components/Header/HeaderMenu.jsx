@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { IconButton, MenuItem, Menu, Avatar } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { signOut } from "../../reducks/users/operations";
-import guestuserimage from "../../assets/img/guestuserimage.png";
+import guestUserImage from "../../assets/img/guest_user_image.png";
 import { useNavigate } from 'react-router-dom';
 
 const HeaderMenu = (props) => {
@@ -40,7 +40,7 @@ const HeaderMenu = (props) => {
             <IconButton onClick={handleMenuToggle}>
                 <Avatar
                     alt={props.username}
-                    src={hasUserimage() ? guestuserimage : props.userimage}
+                    src={hasUserimage() ? guestUserImage : props.userimage}
                     sx={{ width: 40, height: 40 }}
                 />
             </IconButton>

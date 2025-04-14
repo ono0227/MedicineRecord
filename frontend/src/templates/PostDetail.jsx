@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { PrimaryButton } from '../components/UIkit';
 import { getPosts } from "../reducks/posts/selectors";
-import { deletePost } from '../reducks/posts/operations';
+import { deletePost, fetchPosts } from '../reducks/posts/operations';
 import { Paper, Grid, Typography, Box } from "@mui/material";
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -31,6 +31,10 @@ const PostDetail = () => {
           [medicineImage, setMedicineImage] = useState(""),
           [ingestionAmount, setIngestionAmount] = useState(""),
           [comment, setComment] = useState("");
+
+    useEffect(() => {
+        dispatch(fetchPosts());
+    }, [dispatch]);
 
     useEffect(() => {
         const targetPost = posts.find(post => String(post.id) === id);

@@ -4,7 +4,7 @@ import { UserImageArea } from "../components/User";
 import { updateUser } from "../reducks/users/operations";
 import { useDispatch, useSelector } from "react-redux";
 import { getEmail, getUserImage, getUserName } from "../reducks/users/selectors";
-import guestuserimage from "../assets/img/guestuserimage.png";
+import guestUserImage from "../assets/img/guest_user_image.png";
 import { styled } from "@mui/material/styles";
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -62,7 +62,7 @@ const UserEdit = () => {
                 <StyledPaper sx={{ width: '100%', mt: 2 }}>
                     <Avatar
                         alt={username}
-                        src={hasUserimage() ? guestuserimage : userimage}
+                        src={hasUserimage() ? guestUserImage : userimage}
                         sx={{ width: 80, height: 80, mb: 2 }}
                     />
                     <UserImageArea setUserImage={setUserImage} />
