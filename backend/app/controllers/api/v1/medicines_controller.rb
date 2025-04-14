@@ -10,9 +10,8 @@ class Api::V1::MedicinesController < Api::V1::AliasController
 
     # インスタンス変数に格納された薬の情報を単位とカテゴリー名の情報を付加してJSON形式で返す
     medicines_with_category = @medicines.map do |medicine|
-      category_name = medicine.category&.name || "カテゴリー未設定"
-      unit_value = medicine.unit
-      merged_data = medicine.as_json.merge(category_name: category_name, unit: unit_value || "単位未設定")
+      category_name = medicine.category&.name
+      merged_data = medicine.as_json.merge(category_name: category_name)
     end
 
     render json: medicines_with_category
@@ -23,21 +22,16 @@ class Api::V1::MedicinesController < Api::V1::AliasController
     category_name = params[:medicine][:category_name]
     category = current_user.categories.find_by(name: category_name)
 
-    #　カテゴリー名とカテゴリーのIDが一致する場合
-    if category
-      #medicine_paramsからcategory_nameを除外する
-      medicine_params_without_category_name = medicine_params.except(:category_name)
+    #medicine_paramsからcategory_nameを除外する
+    medicine_params_without_category_name = medicine_params.except(:category_name)
 
-      #カテゴリーのIDも含めて薬のインスタンスを作成
-      @medicine = current_user.medicines.new(medicine_params_without_category_name.merge(category_id: category.id))
+    #カテゴリーのIDも含めて薬のインスタンスを作成
+    @medicine = current_user.medicines.new(medicine_params_without_category_name.merge(category_id: category.id))
 
-      if @medicine.save
-        render json: @medicine, status: :created
-      else
-        render json: @medicine.errors, status: :unprocessable_entity
-      end
+    if @medicine.save
+      render json: @medicine, status: :created
     else
-      render json: { error: "指定されたカテゴリーが見つかりません" }, status: :not_found
+      render json: @medicine.errors, status: :unprocessable_entity
     end
   end
 
@@ -46,20 +40,14 @@ class Api::V1::MedicinesController < Api::V1::AliasController
     category_name = params[:medicine][:category_name]
     category = current_user.categories.find_by(name: category_name)
 
-    #　カテゴリー名とカテゴリーのIDが一致する場合
-    if category
+    #medicine_paramsからcategory_nameを除外する
+    medicine_params_without_category_name = medicine_params.except(:category_name)
 
-      #medicine_paramsからcategory_nameを除外する
-      medicine_params_without_category_name = medicine_params.except(:category_name)
-
-      #カテゴリーのIDも含めて薬を更新
-      if @medicine.update(medicine_params_without_category_name.merge(category_id: category.id))
-        render json: @medicine
-      else
-        render json: @medicine.errors, status: :unprocessable_entity
-      end
+    #カテゴリーのIDも含めて薬を更新
+    if @medicine.update(medicine_params_without_category_name.merge(category_id: category.id))
+      render json: @medicine
     else
-      render json: { error: "指定されたカテゴリーが見つかりません" }, status: :not_found
+      render json: @medicine.errors, status: :unprocessable_entity
     end
   end
 

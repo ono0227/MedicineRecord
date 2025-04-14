@@ -11,7 +11,7 @@
 #ユーザ毎にcategoriesテーブルにカテゴリー名のデータを投入
 User.all.each do |user|
     Category.find_or_create_by(user_id: user.id, name: 'tablet')
-    Category.find_or_create_by(user_id: user.id, name: 'power')
+    Category.find_or_create_by(user_id: user.id, name: 'powder')
     Category.find_or_create_by(user_id: user.id, name: 'capsule')
     Category.find_or_create_by(user_id: user.id, name: 'liquid')
     Category.find_or_create_by(user_id: user.id, name: 'ointment')

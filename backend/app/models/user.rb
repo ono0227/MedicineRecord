@@ -19,7 +19,7 @@ class User < ApplicationRecord
   #categoriesテーブルにデフォルトのカテゴリー名を作成
   def create_default_categories
     Category.create(user_id: id, name: 'tablet')
-    Category.create(user_id: id, name: 'power')
+    Category.create(user_id: id, name: 'powder')
     Category.create(user_id: id, name: 'capsule')
     Category.create(user_id: id, name: 'liquid')
     Category.create(user_id: id, name: 'ointment')

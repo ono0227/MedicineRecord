@@ -3,7 +3,7 @@ import Router from './Router';
 import { Header } from './components/Header';
 import { ScrollToTop } from './components/UIkit';
 import { Footer } from './components/Footer';
-import backgroundimage from './assets/img/backgroundimage.jpeg';
+import backgroundImage from './assets/img/background_image.jpeg';
 import './assets/reset.css';
 import './assets/style.css';
 
@@ -15,7 +15,7 @@ const App = () => {
       <main className="c-main">
         <div
           style={{
-            backgroundImage: `url(${backgroundimage})`,
+            backgroundImage: `url(${backgroundImage})`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             minHeight: '100vh',
