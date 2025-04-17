@@ -1,0 +1,22 @@
+{
+    "extends": [
+      "react-app",
+      "eslint:recommended",
+      "plugin:import/errors",
+      "plugin:prettier/recommended"
+    ],
+    "plugins": ["import"],
+    "env": { "node": true, "es6": true },
+    "settings": {
+      "import/resolver": {
+        "node": {
+          "extensions": [".js", ".jsx"]
+        }
+      }
+    },
+    "rules": {
+      "sort-imports": 0,
+      "import/order": [2, { "alphabetize": { "order": "asc" } }],
+      "import/no-unresolved": "off"
+    }
+  }
