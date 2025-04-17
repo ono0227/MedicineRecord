@@ -1,1 +1,1 @@
-export { default as UserImageArea } from './UserImageArea';
+export { default as UserImageArea } from './UserImageArea'
