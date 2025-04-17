@@ -8,18 +8,18 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-#ユーザ毎にcategoriesテーブルにカテゴリー名のデータを投入
-User.all.each do |user|
-    Category.find_or_create_by(user_id: user.id, name: 'tablet')
-    Category.find_or_create_by(user_id: user.id, name: 'powder')
-    Category.find_or_create_by(user_id: user.id, name: 'capsule')
-    Category.find_or_create_by(user_id: user.id, name: 'liquid')
-    Category.find_or_create_by(user_id: user.id, name: 'ointment')
-    Category.find_or_create_by(user_id: user.id, name: 'skin_patch')
-    Category.find_or_create_by(user_id: user.id, name: 'eye_drops')
-    Category.find_or_create_by(user_id: user.id, name: 'nasal_drops')
-    Category.find_or_create_by(user_id: user.id, name: 'ear_drops')
-    Category.find_or_create_by(user_id: user.id, name: 'injection')
-  end
+# ユーザ毎にcategoriesテーブルにカテゴリー名のデータを投入
+User.find_each do |user|
+  Category.find_or_create_by(user_id: user.id, name: 'tablet')
+  Category.find_or_create_by(user_id: user.id, name: 'powder')
+  Category.find_or_create_by(user_id: user.id, name: 'capsule')
+  Category.find_or_create_by(user_id: user.id, name: 'liquid')
+  Category.find_or_create_by(user_id: user.id, name: 'ointment')
+  Category.find_or_create_by(user_id: user.id, name: 'skin_patch')
+  Category.find_or_create_by(user_id: user.id, name: 'eye_drops')
+  Category.find_or_create_by(user_id: user.id, name: 'nasal_drops')
+  Category.find_or_create_by(user_id: user.id, name: 'ear_drops')
+  Category.find_or_create_by(user_id: user.id, name: 'injection')
+end
 
-  puts '既存のユーザーに関連付けて基本的なカテゴリーデータを投入しました。'
+Rails.logger.info '既存のユーザーに関連付けて基本的なカテゴリーデータを投入しました。'

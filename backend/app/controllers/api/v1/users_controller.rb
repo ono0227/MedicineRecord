@@ -6,4 +6,3 @@ class Api::V1::UsersController < Api::V1::AliasController
     render json: { data: @user, status: :success }
   end
 end
-  

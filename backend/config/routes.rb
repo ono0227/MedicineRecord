@@ -8,8 +8,8 @@ Rails.application.routes.draw do
       resources :medicines
       resources :categories
 
-      get "users/currentuser"
-      get "up" => "rails/health#show", as: :rails_health_check
+      get 'users/currentuser'
+      get 'up' => 'rails/health#show', as: :rails_health_check
     end
   end
 
