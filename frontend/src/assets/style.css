@@ -14,8 +14,14 @@
 
 /*********** Section ***********/
 .c-main {
-    padding: 96px 0
+    /* 既存の.c-mainのスタイル */
+    padding-top: 96px;
+    padding-bottom: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
+
 .c-section-wrapin {
     margin: 0 auto;
     max-width: 575px;
@@ -55,7 +61,7 @@
     text-align: center;
 }
 .c-menu_position {
-    position:fixed;	
+    position:fixed;
 	top:0px;
 	right:0px;
 }
@@ -114,6 +120,7 @@
     flex-flow: row wrap;
     list-style: none;
     margin: 0 1rem;
+    background-color: #f0f0f0;
 }
 
 .l-footer > a {
