@@ -1,11 +1,11 @@
-import React from 'react';
-import Router from './Router';
-import { Header } from './components/Header';
-import { ScrollToTop } from './components/UIkit';
-import { Footer } from './components/Footer';
-import backgroundImage from './assets/img/background_image.jpeg';
-import './assets/reset.css';
-import './assets/style.css';
+import React from 'react'
+import Router from './Router'
+import backgroundImage from './assets/img/background_image.jpeg'
+import { Footer } from './components/Footer'
+import { Header } from './components/Header'
+import { ScrollToTop } from './components/UIkit'
+import './assets/reset.css'
+import './assets/style.css'
 
 const App = () => {
   return (
@@ -26,7 +26,7 @@ const App = () => {
       </main>
       <Footer />
     </>
-  );
-};
+  )
+}
 
-export default App;
+export default App

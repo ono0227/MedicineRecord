@@ -1,17 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import createStore from './reducks/store/store';
-import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import { theme } from './assets/theme';
-import * as serviceWorker from './serviceWorker';
-import App from './App';
+import { ThemeProvider } from '@mui/material/styles'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
+import { BrowserRouter } from 'react-router-dom'
+import App from './App'
+import { theme } from './assets/theme'
+import createStore from './reducks/store/store'
+import * as serviceWorker from './serviceWorker'
 
-export const store = createStore();
+export const store = createStore()
 
 ReactDOM.render(
-  <Provider store={store} >
+  <Provider store={store}>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <App />
@@ -21,4 +21,4 @@ ReactDOM.render(
   document.getElementById('root'),
 )
 
-serviceWorker.unregister();
+serviceWorker.unregister()

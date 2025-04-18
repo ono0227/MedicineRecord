@@ -1,24 +1,24 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import { getIsSignedIn } from './reducks/users/selectors';
-import { listenAuthState } from "./reducks/users/operations";
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { listenAuthState } from './reducks/users/operations'
+import { getIsSignedIn } from './reducks/users/selectors'
 
 const Auth = ({ children }) => {
-    const dispatch = useDispatch();
-    const selector = useSelector((state) => state);
-    const isSignedIn = getIsSignedIn(selector);
+  const dispatch = useDispatch()
+  const selector = useSelector((state) => state)
+  const isSignedIn = getIsSignedIn(selector)
 
-    useEffect(() => {
-        if(!isSignedIn){
-            dispatch(listenAuthState())
-        }
-    }, [dispatch, isSignedIn]);
-
-    if(!isSignedIn) {
-        return <></>
-    } else {
-        return children
+  useEffect(() => {
+    if (!isSignedIn) {
+      dispatch(listenAuthState())
     }
+  }, [dispatch, isSignedIn])
+
+  if (!isSignedIn) {
+    return <></>
+  } else {
+    return children
+  }
 }
 
-export default Auth;
+export default Auth

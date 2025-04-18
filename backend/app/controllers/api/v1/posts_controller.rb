@@ -1,6 +1,6 @@
 class Api::V1::PostsController < Api::V1::AliasController
   before_action :authenticate_user!, only: [:index, :create, :update, :destroy]
-  before_action :set_post, only: %i[ update destroy ]
+  before_action :set_post, only: %i[update destroy]
 
   # GET /posts_with_medicine
   def index
@@ -15,10 +15,10 @@ class Api::V1::PostsController < Api::V1::AliasController
 
     medicine = current_user.medicines.find_by(name: medicine_name)
 
-    #medicine_paramsからmedicine_nameとmedicine_imageを除外する
+    # medicine_paramsからmedicine_nameとmedicine_imageを除外する
     post_params_without_medicine_name_and_medicine_image = post_params.except(:medicine_name, :medicine_image)
 
-    #薬のIDも含めて薬のインスタンスを作成
+    # 薬のIDも含めて薬のインスタンスを作成
     @post = current_user.posts.new(post_params_without_medicine_name_and_medicine_image.merge(medicine_id: medicine.id))
 
     if @post.save
@@ -34,10 +34,10 @@ class Api::V1::PostsController < Api::V1::AliasController
 
     medicine = current_user.medicines.find_by(name: medicine_name)
 
-    #post_paramsからmedicine_nameとmedicine_imageを除外する
+    # post_paramsからmedicine_nameとmedicine_imageを除外する
     post_params_without_medicine_name_and_medicine_image = post_params.except(:medicine_name, :medicine_image)
 
-    #薬のIDも含めてpostを更新
+    # 薬のIDも含めてpostを更新
     if @post.update(post_params_without_medicine_name_and_medicine_image.merge(medicine_id: medicine.id))
       render json: @post
     else
@@ -55,7 +55,7 @@ class Api::V1::PostsController < Api::V1::AliasController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_post
-    #binding.pry
+    # binding.pry
     @post = current_user.posts.find(params[:id])
   end
 

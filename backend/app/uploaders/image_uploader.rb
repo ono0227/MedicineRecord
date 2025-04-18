@@ -18,9 +18,9 @@ class ImageUploader < CarrierWave::Uploader::Base
   #   # For Rails 3.1+ asset pipeline compatibility:
   #   # ActionController::Base.helpers.asset_path("fallback/" + [version_name, "default.png"].compact.join('_'))
   #
-  #def default_url(*args)
+  # def default_url(*args)
   #  ActionController::Base.helpers.asset_path("fallback/" + [version_name, "default.png"].compact.join('_'))
-  #end
+  # end
   # Process files as they are uploaded:
   # process scale: [200, 300]
   #
@@ -29,9 +29,9 @@ class ImageUploader < CarrierWave::Uploader::Base
   # end
 
   # Create different versions of your uploaded files:
-   version :thumb do
-     process resize_to_fit: [50, 50]
-   end
+  version :thumb do
+    process resize_to_fit: [50, 50]
+  end
 
   # Add an allowlist of extensions which are allowed to be uploaded.
   # For images you might use something like this:
@@ -40,7 +40,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   end
   # Override the filename of the uploaded files:
   # Avoid using model.id or version_name here, see uploader/store.rb for details.
-  #def filename
+  # def filename
   #  "#{SecureRandom.uuid}.#{file.extension}" if file.present?
-  #end
+  # end
 end
