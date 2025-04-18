@@ -14,7 +14,12 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const StyledSelect = styled(Select)(({ theme }) => ({
   width: '100%',
-  marginBottom: theme.spacing(2),
+  //marginBottom: theme.spacing(2),
+}))
+
+const BarGraphContainer = styled('div')(({ theme }) => ({
+  minHeight: `calc(100vh - 60px - 80px)`,
+  paddingBottom: theme.spacing(6),
 }))
 
 const BarGraph = () => {
@@ -128,7 +133,7 @@ const BarGraph = () => {
     : {}
 
   return (
-    <div className="c-section-container">
+    <BarGraphContainer className="c-section-container">
       <h2 className="u-text__headline u-text-center">月別服薬量</h2>
       <StyledSelect
         labelId="medicine-select-label"
@@ -146,7 +151,7 @@ const BarGraph = () => {
       {chartData && <Bar data={chartData} options={chartOptions} />}
       {selectedMedicineName && !chartData && <p>{selectedMedicineName} の記録はありません。</p>}
       <NavigateTabs tabConfig={tabConfig} value={currentTabUrl} onChange={handleTabChange} />
-    </div>
+    </BarGraphContainer>
   )
 }
 

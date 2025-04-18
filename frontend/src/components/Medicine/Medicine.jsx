@@ -14,6 +14,14 @@ const StyledCard = styled(Card)(({ theme }) => ({
     margin: theme.spacing(2),
     width: `calc(33.3333% - ${theme.spacing(4)})`,
   },
+  [theme.breakpoints.up('md')]: {
+    margin: theme.spacing(2),
+    width: `calc(33.3333% - ${theme.spacing(4)})`,
+  },
+  [theme.breakpoints.up('lg')]: {
+    margin: theme.spacing(2),
+    width: '100%',
+  },
 }))
 
 const StyledCardMedia = styled(CardMedia)({

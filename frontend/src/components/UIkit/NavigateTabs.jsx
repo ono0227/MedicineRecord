@@ -1,8 +1,13 @@
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
+import { styled } from '@mui/material/styles'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+
+const StyledTabs = styled(Tabs)(({ theme }) => ({
+  width: '100%',
+}))
 
 // Tabコンポーネントを拡張し、リンクとして機能させる
 const LinkTab = (props) => {
@@ -39,10 +44,17 @@ const NavigateTabs = ({ tabConfig, value, onChange }) => {
   }
 
   return (
-    <Tabs value={getTabIndexFromPath()} onChange={handleChange} aria-label="navigation tabs" role="navigation">
+    <StyledTabs
+      value={getTabIndexFromPath()}
+      onChange={handleChange}
+      aria-label="navigation tabs"
+      role="navigation"
+      variant="scrollable"
+      scrollButtons="auto"
+    >
       {tabConfig &&
         tabConfig.map((tab) => <LinkTab key={tab.value} label={tab.label} href={tab.value} value={tab.index} />)}
-    </Tabs>
+    </StyledTabs>
   )
 }
 

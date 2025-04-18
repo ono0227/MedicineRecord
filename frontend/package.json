@@ -38,7 +38,8 @@
     "eject": "react-scripts eject",
     "lint:check": "eslint './src/**/*.{js,jsx}'",
     "lint:fix": "eslint --fix './src/**/*.{js,jsx}'",
-    "format": "prettier --write './src/**/*.{js,jsx}'"
+    "format": "prettier --write './src/**/*.{js,jsx}'",
+    "format:check": "prettier --check './src/**/*.{js,jsx}'"
   },
   "eslintConfig": {
     "extends": [

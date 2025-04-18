@@ -13,11 +13,6 @@ html {
     box-sizing: border-box;
 }
 
-body {
-    font-feature-settings: "palt";
-    margin: 0;
-}
-
 article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
     display: block
 }
@@ -186,17 +181,25 @@ abbr, acronym, blockquote, code, input, kbd, q, samp, var {
 }
 
 body {
-    background: #fff;
     color: #000;
     cursor: auto;
     font-size: 1em;
     font-style: normal;
     font-weight: 300;
     line-height: 1.444;
-    margin: 0;
     padding: 0;
     overflow-wrap: break-word;
-    word-wrap: break-word
+    word-wrap: break-word;
+    font-feature-settings: "palt";
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-image: url('./img/background_image.jpeg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed
 }
 
 body::after {

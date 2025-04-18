@@ -13,6 +13,7 @@ import HeaderMenu from './HeaderMenu'
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: '#06D8F8',
+  height: '60px',
 }))
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({

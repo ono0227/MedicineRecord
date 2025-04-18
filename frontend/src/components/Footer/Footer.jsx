@@ -10,6 +10,7 @@ const StyledFooter = styled('footer')(({ theme }) => ({
   backgroundColor: theme.palette.grey[200],
   padding: theme.spacing(3, 0),
   marginTop: theme.spacing(4),
+  minHeight: '80px',
 }))
 
 const Footer = () => {

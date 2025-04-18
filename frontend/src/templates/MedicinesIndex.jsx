@@ -44,7 +44,7 @@ const MedicinesIndex = () => {
         <Grid container spacing={2}>
           {medicines && medicines.length > 0 ? (
             medicines.map((medicine) => (
-              <Grid item xs={12} sm={6} md={4} key={medicine.id}>
+              <Grid item xs={12} sm={6} md={6} key={medicine.id}>
                 <Medicine
                   id={medicine.id}
                   medicineName={medicine.name}
