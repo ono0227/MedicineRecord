@@ -49,7 +49,7 @@ jobs:
       # 5. データベース接続を待機
       - name: Wait for DB connection
         run: |
-          for i in {1..120}; do
+          for i in {1..90}; do
             docker compose exec -T db mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT 1;" && break || sleep 5
           done
 
@@ -58,7 +58,9 @@ jobs:
 
       - name: Reset Rails DB connection
         run: |
-          docker compose exec -T back rails db:environment:set RAILS_ENV=development || true
+          for i in {1..60}; do
+            docker compose exec -T back rails db:environment:set RAILS_ENV=development && break || sleep 5
+          done
 
         # 6. データベースのセットアップ
       - name: Create DB
@@ -73,6 +75,9 @@ jobs:
       # 7. 静的解析とテストの実行
       - name: Run Rubocop
         run: docker compose exec -T back bundle exec rubocop
+
+      - name: Install RSpec
+        run: docker compose exec -T back bundle exec rails generate rspec:install || true
 
       - name: Run RSpec
         run: docker compose exec -T back bin/rspec
