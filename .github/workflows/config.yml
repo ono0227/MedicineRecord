@@ -15,49 +15,55 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. レポジトリを導入
+      # 1. Docker CLI と Docker Compose プラグインの確認
+      - name: Check Docker CLI version
+        run: |
+          docker --version
+          docker compose version
+
+      # 2. レポジトリを導入
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. 環境変数を設定
+      # 3. 環境変数を設定
       - name: Set environment variables
         run: |
           echo "${{ secrets.MASTER_KEY }}" > backend/config/master.key
 
-      # 3. Docker コンテナをビルドして起動
+      # 4. Docker コンテナをビルドして起動
       - name: Build and run Docker containers
         run: |
-          docker-compose build --no-cache
-          docker-compose up -d
+          docker compose build --no-cache
+          docker compose up -d
 
-      # 4. データベース接続を待機
+      # 5. データベース接続を待機
       - name: Wait for DB connection
         run: |
           for i in {1..30}; do
-            docker-compose exec -T db mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT 1;" && break || sleep 5
+            docker compose exec -T db mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT 1;" && break || sleep 5
           done
 
-      # 5. データベースのセットアップ
+      # 6. データベースのセットアップ
       - name: Create DB
-        run: docker-compose exec -T back rails db:create
+        run: docker compose exec -T back rails db:create
 
       - name: Run migrations
-        run: docker-compose exec -T back rails db:migrate
+        run: docker compose exec -T back rails db:migrate
 
       - name: Load seed data
-        run: docker-compose exec -T back rails db:seed
+        run: docker compose exec -T back rails db:seed
 
-      # 6. 静的解析とテストの実行
+      # 7. 静的解析とテストの実行
       - name: Run Rubocop
-        run: docker-compose exec -T back bundle exec rubocop
+        run: docker compose exec -T back bundle exec rubocop
 
       - name: Run RSpec
-        run: docker-compose exec -T back bin/rspec
+        run: docker compose exec -T back bin/rspec
 
-      # 7. ESLint チェックを実行
+      # 8. ESLint チェックを実行
       - name: Run ESLint
-        run: docker-compose exec -T front yarn lint:check
+        run: docker compose exec -T front yarn lint:check
 
-      # 8. Prettier チェックを実行
+      # 9. Prettier チェックを実行
       - name: Run Prettier
-        run: docker-compose exec -T front yarn format:check
+        run: docker compose exec -T front yarn format:check
