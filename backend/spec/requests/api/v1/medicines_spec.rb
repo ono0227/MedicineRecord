@@ -1,15 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Api::V1::Medicines', type: :request do
-  #let(:headers) { current_user.create_new_auth_token }
-  #let(:current_user) { create(:user) }
-  #let(:uploaded_image) { fixture_file_upload(image_path, 'image/png') }
-  #let(:medicine) { create(:medicine, user: current_user, category: category) }
-  #let(:medicine_id) { medicine.id }
-  #let(:category) { create(:category, user: current_user) }
-
   describe 'GET /api/v1/medicines' do
-    subject {get(api_v1_medicines_path, headers: headers)}
+    subject { get(api_v1_medicines_path, headers: headers) }
 
     let(:headers) { current_user.create_new_auth_token }
     let(:current_user) { create(:user) }
@@ -49,7 +42,6 @@ RSpec.describe 'Api::V1::Medicines', type: :request do
     subject { put(api_v1_medicine_path(medicine.id), headers: headers, params: @params) }
 
     let(:image_path) { Rails.root.join('spec', 'fixtures', 'files', 'test_medicine.png') }
-    #let(:uploaded_image) { fixture_file_upload(image_path, 'image/png') }
     let(:headers) { current_user.create_new_auth_token }
     let(:current_user) { create(:user) }
     let(:category) { create(:category, user: current_user) }
