@@ -53,25 +53,7 @@ jobs:
             docker compose exec -T db mysql -uroot -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "SELECT 1;" && break || sleep 5
           done
 
-      # 6. Rails アプリケーションのヘルスチェックを待機 (/api/v1/up が 200 OK を返すまで)
-      #- name: Wait for Rails health check
-      #  run: |
-      #    for i in {1..60}; do
-      #      RESPONSE=$(docker compose exec -T back curl -s http://localhost:3000/api/v1/up)
-      #      if echo "$RESPONSE" | grep -q '{"status":"up"}'; then
-      #        echo "Rails health check passed."
-      #        break
-      #      else
-      #        echo "Waiting for Rails health check... ($i/60)"
-      #        sleep 5
-      #      fi
-      #    done
-      #    if [[ "$RESPONSE" != *"\"status\":\"up\""* ]]; then
-      #      echo "Rails health check failed after 60 retries."
-      #      exit 1
-      #    fi
-
-      # 7. データベースのセットアップ
+      # 6. データベースのセットアップ
       - name: Create DB
         run: docker compose exec -T back rails db:create
 
@@ -81,17 +63,17 @@ jobs:
       - name: Load seed data
         run: docker compose exec -T back rails db:seed
 
-      # 8. 静的解析とテストの実行
+      # 7. 静的解析とテストの実行
       - name: Run Rubocop
         run: docker compose exec -T back bundle exec rubocop
 
       - name: Run RSpec
         run: docker compose exec -T back bin/rspec
 
-      # 9. ESLint チェックを実行
+      # 8. ESLint チェックを実行
       - name: Run ESLint
         run: docker compose exec -T front yarn lint:check
 
-      # 10. Prettier チェックを実行
+      # 9. Prettier チェックを実行
       - name: Run Prettier
         run: docker compose exec -T front yarn format:check
