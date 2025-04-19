@@ -46,14 +46,18 @@ jobs:
           docker compose build --no-cache
           docker compose up -d
 
-      # 5. データベース接続を待機 (MySQL が起動したか確認)
+      # 5. Wait for front container healthcheck
+      - name: Wait for front container healthcheck
+        run: docker compose wait medicinerecord-front-1
+
+      # 6. データベース接続を待機 (MySQL が起動したか確認)
       - name: Wait for DB connection
         run: |
           for i in {1..120}; do
             docker compose exec -T db mysql -uroot -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "SELECT 1;" && break || sleep 5
           done
 
-      # 6. データベースのセットアップ
+      # 7. データベースのセットアップ
       - name: Create DB
         run: docker compose exec -T back rails db:create
 
@@ -63,17 +67,17 @@ jobs:
       - name: Load seed data
         run: docker compose exec -T back rails db:seed
 
-      # 7. 静的解析とテストの実行
+      # 8. 静的解析とテストの実行
       - name: Run Rubocop
         run: docker compose exec -T back bundle exec rubocop
 
       - name: Run RSpec
         run: docker compose exec -T back bin/rspec
 
-      # 8. ESLint チェックを実行
+      # 9. ESLint チェックを実行
       - name: Run ESLint
         run: docker compose exec -T front yarn lint:check
 
-      # 9. Prettier チェックを実行
+      # 10. Prettier チェックを実行
       - name: Run Prettier
         run: docker compose exec -T front yarn format:check
