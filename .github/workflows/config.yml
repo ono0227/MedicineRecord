@@ -46,11 +46,11 @@ jobs:
           docker compose build --no-cache
           docker compose up -d
 
-      # 5. データベース接続を待機
+      # 5. データベース接続を待機 (MySQL が起動したか確認)
       - name: Wait for DB connection
         run: |
           for i in {1..120}; do
-            docker compose exec -T db mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT 1;" && break || sleep 5
+            docker compose exec -T db mysql -uroot -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "SELECT 1;" && break || sleep 5
           done
 
       # 6. Rails アプリケーションのヘルスチェックを待機
