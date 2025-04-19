@@ -1,3 +1,4 @@
+---
 name: CI/CD
 
 on:
@@ -25,23 +26,33 @@ jobs:
           --health-retries=3
 
     steps:
-      # 1. リポジトリをチェックアウト
+      # 1. レポジトリを導入
       - name: Checkout code
         uses: actions/checkout@v3
 
       # 2. 環境変数を設定
       - name: Set environment variables
         run: |
-          echo "REACT_APP_AUTH_URL=${{ secrets.REACT_APP_AUTH_URL }}" >> ./frontend/.env.local
-          echo "REACT_APP_SIGN_IN_URL=${{ secrets.REACT_APP_SIGN_IN_URL }}" >> ./frontend/.env.local
-          echo "REACT_APP_SIGN_OUT_URL=${{ secrets.REACT_APP_SIGN_OUT_URL }}" >> ./frontend/.env.local
-          echo "REACT_APP_PASSWORD_URL=${{ secrets.REACT_APP_PASSWORD_URL }}" >> ./frontend/.env.local
-          echo "REACT_APP_UPDATE_PASSWORD_URL=${{ secrets.REACT_APP_UPDATE_PASSWORD_URL }}" >> ./frontend/.env.local
-          echo "REACT_APP_LISTEN_AUTH_STATE_URL=${{ secrets.REACT_APP_LISTEN_AUTH_STATE_URL }}" >> ./frontend/.env.local
-          echo "REACT_APP_MEDICINES_URL=${{ secrets.REACT_APP_MEDICINES_URL }}" >> ./frontend/.env.local
-          echo "REACT_APP_POSTS_URL=${{ secrets.REACT_APP_POSTS_URL }}" >> ./frontend/.env.local
-          echo "REACT_APP_CATEGORIES_URL=${{ secrets.REACT_APP_CATEGORIES_URL }}" >> ./frontend/.env.local
-          echo "REACT_APP_WEBHOOK_URL=${{ secrets.REACT_APP_WEBHOOK_URL }}" >> ./frontend/.env.local
+          echo "REACT_APP_AUTH_URL=${{ secrets.REACT_APP_AUTH_URL }}" \
+            >> ./frontend/.env.local
+          echo "REACT_APP_SIGN_IN_URL=${{ secrets.REACT_APP_SIGN_IN_URL }}" \
+            >> ./frontend/.env.local
+          echo "REACT_APP_SIGN_OUT_URL=${{ secrets.REACT_APP_SIGN_OUT_URL }}" \
+            >> ./frontend/.env.local
+          echo "REACT_APP_PASSWORD_URL=${{ secrets.REACT_APP_PASSWORD_URL }}" \
+            >> ./frontend/.env.local
+          echo "REACT_APP_UPDATE_PASSWORD_URL=${{ secrets.REACT_APP_UPDATE_PASSWORD_URL }}" \
+            >> ./frontend/.env.local
+          echo "REACT_APP_LISTEN_AUTH_STATE_URL=${{ secrets.REACT_APP_LISTEN_AUTH_STATE_URL }}" \
+            >> ./frontend/.env.local
+          echo "REACT_APP_MEDICINES_URL=${{ secrets.REACT_APP_MEDICINES_URL }}" \
+            >> ./frontend/.env.local
+          echo "REACT_APP_POSTS_URL=${{ secrets.REACT_APP_POSTS_URL }}" \
+            >> ./frontend/.env.local
+          echo "REACT_APP_CATEGORIES_URL=${{ secrets.REACT_APP_CATEGORIES_URL }}" \
+            >> ./frontend/.env.local
+          echo "REACT_APP_WEBHOOK_URL=${{ secrets.REACT_APP_WEBHOOK_URL }}" \
+            >> ./frontend/.env.local
 
       # 3. Backend の依存関係をインストール
       - name: Install backend dependencies
