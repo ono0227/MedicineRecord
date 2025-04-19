@@ -1,103 +1,104 @@
 ---
-name: CI/CD
+  name: CI/CD
 
-on:
-  push:
-    branches:
-      - develop*
-  pull_request:
-    branches:
-      - develop*
+  on:
+    push:
+      branches:
+        - develop*
+    pull_request:
+      branches:
+        - develop*
 
-jobs:
-  build-and-test:
-    name: Build and Test
-    runs-on: ubuntu-latest
+  jobs:
+    build-and-test:
+      name: Build and Test
+      runs-on: ubuntu-latest
 
-    services:
-      db:
-        image: mysql:8.0
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: app_test
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+      services:
+        db:
+          image: mysql:8.0
+          ports:
+            - 3306:3306
+          env:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: app_test
+          options: >-
+            --health-cmd="mysqladmin ping --silent"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=3
 
-    steps:
-      # 1. レポジトリを導入
-      - name: Checkout code
-        uses: actions/checkout@v3
+      steps:
+        # 1. レポジトリを導入
+        - name: Checkout code
+          uses: actions/checkout@v3
 
-      # 2. 環境変数を設定
-      - name: Set environment variables
-        run: |
-          echo "REACT_APP_AUTH_URL=${{ secrets.REACT_APP_AUTH_URL }}" \
-            >> ./frontend/.env.local
-          echo "REACT_APP_SIGN_IN_URL=${{ secrets.REACT_APP_SIGN_IN_URL }}" \
-            >> ./frontend/.env.local
-          echo "REACT_APP_SIGN_OUT_URL=${{ secrets.REACT_APP_SIGN_OUT_URL }}" \
-            >> ./frontend/.env.local
-          echo "REACT_APP_PASSWORD_URL=${{ secrets.REACT_APP_PASSWORD_URL }}" \
-            >> ./frontend/.env.local
-          echo "REACT_APP_UPDATE_PASSWORD_URL=${{ secrets.REACT_APP_UPDATE_PASSWORD_URL }}" \
-            >> ./frontend/.env.local
-          echo "REACT_APP_LISTEN_AUTH_STATE_URL=${{ secrets.REACT_APP_LISTEN_AUTH_STATE_URL }}" \
-            >> ./frontend/.env.local
-          echo "REACT_APP_MEDICINES_URL=${{ secrets.REACT_APP_MEDICINES_URL }}" \
-            >> ./frontend/.env.local
-          echo "REACT_APP_POSTS_URL=${{ secrets.REACT_APP_POSTS_URL }}" \
-            >> ./frontend/.env.local
-          echo "REACT_APP_CATEGORIES_URL=${{ secrets.REACT_APP_CATEGORIES_URL }}" \
-            >> ./frontend/.env.local
-          echo "REACT_APP_WEBHOOK_URL=${{ secrets.REACT_APP_WEBHOOK_URL }}" \
-            >> ./frontend/.env.local
+        # 2. 環境変数を設定
+        - name: Set environment variables
+          run: |
+            echo "REACT_APP_AUTH_URL=${{ secrets.REACT_APP_AUTH_URL }}" \
+              >> ./frontend/.env.local
+            echo "REACT_APP_SIGN_IN_URL=${{ secrets.REACT_APP_SIGN_IN_URL }}" \
+              >> ./frontend/.env.local
+            echo "REACT_APP_SIGN_OUT_URL=${{ secrets.REACT_APP_SIGN_OUT_URL }}" \
+              >> ./frontend/.env.local
+            echo "REACT_APP_PASSWORD_URL=${{ secrets.REACT_APP_PASSWORD_URL }}" \
+              >> ./frontend/.env.local
+            echo "REACT_APP_UPDATE_PASSWORD_URL=${{ secrets.REACT_APP_UPDATE_PASSWORD_URL }}" \
+              >> ./frontend/.env.local
+            echo "REACT_APP_LISTEN_AUTH_STATE_URL=${{ secrets.REACT_APP_LISTEN_AUTH_STATE_URL }}" \
+              >> ./frontend/.env.local
+            echo "REACT_APP_MEDICINES_URL=${{ secrets.REACT_APP_MEDICINES_URL }}" \
+              >> ./frontend/.env.local
+            echo "REACT_APP_POSTS_URL=${{ secrets.REACT_APP_POSTS_URL }}" \
+              >> ./frontend/.env.local
+            echo "REACT_APP_CATEGORIES_URL=${{ secrets.REACT_APP_CATEGORIES_URL }}" \
+              >> ./frontend/.env.local
+            echo "REACT_APP_WEBHOOK_URL=${{ secrets.REACT_APP_WEBHOOK_URL }}" \
+              >> ./frontend/.env.local
 
-      # 3. Backend の依存関係をインストール
-      - name: Install backend dependencies
-        working-directory: ./backend
-        run: |
-          gem install bundler --user-install
-          bundle config set path 'vendor/bundle'
-          bundle install
+        # 3. Backend の依存関係をインストール
+        - name: Install backend dependencies
+          working-directory: ./backend
+          run: |
+            gem install bundler --user-install
+            echo 'export PATH="$HOME/.local/share/gem/ruby/3.2.0/bin:$PATH"' >> $GITHUB_ENV
+            bundle config set path 'vendor/bundle'
+            bundle install
 
-      # 4. データベースのセットアップ
-      - name: Setup database
-        working-directory: ./backend
-        run: |
-          RAILS_ENV=test bundle exec rails db:create
-          RAILS_ENV=test bundle exec rails db:migrate
-          RAILS_ENV=test bundle exec rails db:seed
+        # 4. データベースのセットアップ
+        - name: Setup database
+          working-directory: ./backend
+          run: |
+            RAILS_ENV=test bundle exec rails db:create
+            RAILS_ENV=test bundle exec rails db:migrate
+            RAILS_ENV=test bundle exec rails db:seed
 
-      # 5. RSpec テストを実行
-      - name: Run RSpec tests
-        working-directory: ./backend
-        run: bundle exec rspec
+        # 5. RSpec テストを実行
+        - name: Run RSpec tests
+          working-directory: ./backend
+          run: bundle exec rspec
 
-      # 6. RuboCop チェックを実行
-      - name: Run RuboCop
-        working-directory: ./backend
-        run: bundle exec rubocop
+        # 6. RuboCop チェックを実行
+        - name: Run RuboCop
+          working-directory: ./backend
+          run: bundle exec rubocop
 
-      # 7. Frontend の依存関係をインストール
-      - name: Install frontend dependencies
-        working-directory: ./frontend
-        run: yarn install
+        # 7. Frontend の依存関係をインストール
+        - name: Install frontend dependencies
+          working-directory: ./frontend
+          run: yarn install
 
-      # 8. ESLint チェックを実行
-      - name: Run ESLint
-        working-directory: ./frontend
-        run: yarn lint:check
+        # 8. ESLint チェックを実行
+        - name: Run ESLint
+          working-directory: ./frontend
+          run: yarn lint:check
 
-      # 9. Prettier チェックを実行
-      - name: Run Prettier
-        working-directory: ./frontend
-        run: yarn format:check
+        # 9. Prettier チェックを実行
+        - name: Run Prettier
+          working-directory: ./frontend
+          run: yarn format:check
 
-      # 10. 成功メッセージ
-      - name: All checks passed
-        run: echo "All checks passed successfully!"
+        # 10. 成功メッセージ
+        - name: All checks passed
+          run: echo "All checks passed successfully!"
