@@ -29,6 +29,16 @@ jobs:
       - name: Set environment variables
         run: |
           echo "${{ secrets.MASTER_KEY }}" > backend/config/master.key
+          echo "REACT_APP_AUTH_URL=${{ secrets.REACT_APP_AUTH_URL }}" >> frontend/.env.local
+          echo "REACT_APP_SIGN_IN_URL=${{ secrets.REACT_APP_SIGN_IN_URL }}" >> frontend/.env.local
+          echo "REACT_APP_SIGN_OUT_URL=${{ secrets.REACT_APP_SIGN_OUT_URL }}" >> frontend/.env.local
+          echo "REACT_APP_PASSWORD_URL=${{ secrets.REACT_APP_PASSWORD_URL }}" >> frontend/.env.local
+          echo "REACT_APP_UPDATE_PASSWORD_URL=${{ secrets.REACT_APP_UPDATE_PASSWORD_URL }}" >> frontend/.env.local
+          echo "REACT_APP_LISTEN_AUTH_STATE_URL=${{ secrets.REACT_APP_LISTEN_AUTH_STATE_URL }}" >> frontend/.env.local
+          echo "REACT_APP_MEDICINES_URL=${{ secrets.REACT_APP_MEDICINES_URL }}" >> frontend/.env.local
+          echo "REACT_APP_POSTS_URL=${{ secrets.REACT_APP_POSTS_URL }}" >> frontend/.env.local
+          echo "REACT_APP_CATEGORIES_URL=${{ secrets.REACT_APP_CATEGORIES_URL }}" >> frontend/.env.local
+          echo "REACT_APP_WEBHOOK_URL=${{ secrets.REACT_APP_WEBHOOK_URL }}" >> frontend/.env.local
 
       # 4. Docker コンテナをビルドして起動
       - name: Build and run Docker containers
