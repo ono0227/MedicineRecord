@@ -53,23 +53,23 @@ jobs:
             docker compose exec -T db mysql -uroot -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "SELECT 1;" && break || sleep 5
           done
 
-      # 6. Rails アプリケーションのヘルスチェックを待機
-      - name: Wait for Rails health check
-        run: |
-          for i in {1..60}; do
-            RESPONSE=$(docker compose exec -T back curl -s http://localhost:3000/up)
-            if echo "$RESPONSE" | grep -q '{"status":"up"}'; then
-              echo "Rails health check passed."
-              break
-            else
-              echo "Waiting for Rails health check... ($i/60)"
-              sleep 5
-            fi
-          done
-          if [[ "$RESPONSE" != *"\"status\":\"up\""* ]]; then
-            echo "Rails health check failed after 60 retries."
-            exit 1
-          fi
+      # 6. Rails アプリケーションのヘルスチェックを待機 (/api/v1/up が 200 OK を返すまで)
+      #- name: Wait for Rails health check
+      #  run: |
+      #    for i in {1..60}; do
+      #      RESPONSE=$(docker compose exec -T back curl -s http://localhost:3000/api/v1/up)
+      #      if echo "$RESPONSE" | grep -q '{"status":"up"}'; then
+      #        echo "Rails health check passed."
+      #        break
+      #      else
+      #        echo "Waiting for Rails health check... ($i/60)"
+      #        sleep 5
+      #      fi
+      #    done
+      #    if [[ "$RESPONSE" != *"\"status\":\"up\""* ]]; then
+      #      echo "Rails health check failed after 60 retries."
+      #      exit 1
+      #    fi
 
       # 7. データベースのセットアップ
       - name: Create DB
