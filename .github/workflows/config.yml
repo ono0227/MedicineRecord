@@ -2,6 +2,9 @@
 name: CI/CD
 
 on:
+  push:
+    branches:
+      - develop*
   pull_request:
     branches:
       - develop*
@@ -58,7 +61,8 @@ jobs:
       - name: Install backend dependencies
         working-directory: ./backend
         run: |
-          gem install bundler
+          gem install bundler --user-install
+          bundle config set path 'vendor/bundle'
           bundle install
 
       # 4. データベースのセットアップ
