@@ -11,6 +11,8 @@ RUN bundle install
 
 COPY . /app
 
+COPY config/master.key /app/config/master.key
+
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
