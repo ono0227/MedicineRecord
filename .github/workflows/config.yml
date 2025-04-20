@@ -70,11 +70,11 @@ jobs:
       - name: Run RSpec
         run: docker compose exec -T back bin/rspec
 
-      # 8. Front コンテナのログを確認
+      # 8. Frontのコンテナのログを確認
       - name: Check front container logs
         run: docker compose logs front
 
-      # 9. Front コンテナを再起動
+      # 9. Frontのコンテナを再起動
       - name: Restart front container
         run: docker compose up -d front
 
