@@ -19,6 +19,11 @@ const RefreshButton = styled(IconButton)(({ theme }) => ({
   zIndex: 1000,
 }))
 
+const TimelineContainer = styled('div')(({ theme }) => ({
+  minHeight: `calc(100vh - 60px - 80px)`,
+  paddingBottom: theme.spacing(4),
+}))
+
 const Timeline = () => {
   const dispatch = useDispatch()
   const selector = useSelector((state) => state)
@@ -79,7 +84,7 @@ const Timeline = () => {
   }, [posts])
 
   return (
-    <div className="c-section-container">
+    <TimelineContainer className="c-section-container">
       <Typography variant="h4" component="h2" align="center" gutterBottom>
         タイムライン
       </Typography>
@@ -109,7 +114,7 @@ const Timeline = () => {
         </Grid>
       )}
       <NavigateTabs tabConfig={tabConfig} value={currentTabUrl} onChange={handleTabChange} />
-    </div>
+    </TimelineContainer>
   )
 }
 
