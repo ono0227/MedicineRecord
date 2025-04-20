@@ -56,11 +56,11 @@ jobs:
 
       # 5. ESLint チェックを実行
       - name: Run ESLint
-        run: docker run --rm -v ${{ github.workspace }}/frontend:/app front yarn lint:check
+        run: docker run --rm -v ${{ github.workspace }}/frontend:/app ${{ steps.build_front.outputs.image_id }} yarn lint:check
 
       # 6. Prettier チェックを実行
       - name: Run Prettier
-        run: docker run --rm -v ${{ github.workspace }}/frontend:/app front yarn format:check
+        run: docker run --rm -v ${{ github.workspace }}/frontend:/app ${{ steps.build_front.outputs.image_id }} yarn format:check
 
   Rspec-and-Rubocop:
     name: RSpec and Rubocop
