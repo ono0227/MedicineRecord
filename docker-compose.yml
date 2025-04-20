@@ -43,12 +43,6 @@ services:
       - "8000:3000"
     stdin_open: true
     tty: true
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
-      interval: 5s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
 volumes:
   mysql_data:
   uploads_data:
