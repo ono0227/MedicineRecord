@@ -15,7 +15,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     environment:
-      RAILS_ENV: test
       DATABASE_HOST: db
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: password

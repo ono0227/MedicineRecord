@@ -1,7 +1,7 @@
-FROM node:21.5.0
+FROM node:18.15.0-alpine
 WORKDIR /app
 COPY package.json yarn.lock ./
-RUN yarn install
+RUN yarn install --frozen-lockfile
 COPY . .
 RUN yarn build
 RUN yarn global add serve
