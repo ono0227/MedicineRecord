@@ -1,0 +1,140 @@
+version: 2.1
+
+executors:
+  default_container:
+    docker:
+      - image: circleci/ruby:3.2.2-node
+        environment:
+          RAILS_ENV: test
+          BUNDLE_JOBS: 4
+          BUNDLE_RETRY: 3
+          BUNDLE_PATH: vendor/bundle
+      - image: circleci/mysql:8.0
+    working_directory: ~/medicine_record
+
+commands:
+  install_ruby_dependencies:
+    description: Install Ruby dependencies
+    steps:
+      - run:
+          name: Install Bundler
+          command: gem install bundler
+      - run:
+          name: Bundle Install
+          command: bundle install --jobs=4 --retry=3
+
+  install_javascript_dependencies:
+    description: Install Node.js dependencies
+    steps:
+      - run:
+          name: Yarn Install
+          command: yarn install --frozen-lockfile --network-concurrency 1
+
+  setup_database:
+    description: Setup MySQL database
+    steps:
+      - run:
+          name: Wait for MySQL to be ready
+          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
+      - run:
+          name: Create and Migrate Database
+          command: |
+            bundle exec rails db:create db:migrate
+
+  run_rspec:
+    description: Run RSpec tests
+    steps:
+      - run:
+          name: Run RSpec
+          command: bundle exec rspec --format progress
+
+  run_rubocop:
+    description: Run Rubocop
+    steps:
+      - run:
+          name: Run Rubocop
+          command: bundle exec rubocop
+
+  run_eslint_and_prettier:
+    description: Run ESLint and Prettier
+    steps:
+      - run:
+          name: Run ESLint
+          command: yarn lint:check
+      - run:
+          name: Run Prettier
+          command: yarn format:check
+
+jobs:
+  fetch_source_code:
+    executor: default_container
+    steps:
+      - checkout
+      - save_cache:
+          key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/medicine_record
+
+  install_dependencies:
+    executor: default_container
+    steps:
+      - restore_cache:
+          key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+      - install_ruby_dependencies
+      - install_javascript_dependencies
+      - save_cache:
+          key: v1-ruby-dependencies-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+      - save_cache:
+          key: v1-node-dependencies-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+
+  rspec:
+    executor: default_container
+    steps:
+      - restore_cache:
+          key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-ruby-dependencies-{{ checksum "Gemfile.lock" }}
+      - restore_cache:
+          key: v1-node-dependencies-{{ checksum "yarn.lock" }}
+      - setup_database
+      - run_rspec
+
+  rubocop:
+    executor: default_container
+    steps:
+      - restore_cache:
+          key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-ruby-dependencies-{{ checksum "Gemfile.lock" }}
+      - run_rubocop
+
+  eslint_and_prettier:
+    executor: default_container
+    steps:
+      - restore_cache:
+          key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-node-dependencies-{{ checksum "yarn.lock" }}
+      - run_eslint_and_prettier
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - fetch_source_code
+      - install_dependencies:
+          requires:
+            - fetch_source_code
+      - rspec:
+          requires:
+            - install_dependencies
+      - rubocop:
+          requires:
+            - install_dependencies
+      - eslint_and_prettier:
+          requires:
+            - install_dependencies
