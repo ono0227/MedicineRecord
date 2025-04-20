@@ -41,11 +41,14 @@ jobs:
           echo "REACT_APP_WEBHOOK_URL=${{ secrets.REACT_APP_WEBHOOK_URL }}" >> frontend/.env.local
           echo "${{ secrets.MASTER_KEY }}" > backend/temp_master.key
 
-      # 4. Docker コンテナをビルドして起動
-      - name: Build and run Docker containers and get image ID
+      # 4. Docker コンテナをビルドして起動 (フロントエンドのみ)
+      - name: Build and run front container
         id: build_front
         run: |
-          docker compose build --no-cache
+          # フロントエンドのイメージが存在しない場合のみビルド
+          if ! docker images -q front; then
+            docker compose build --no-cache front
+          fi
           docker compose up -d front
           # イメージIDを取得して出力
           IMAGE_ID=$(docker images -q front)
