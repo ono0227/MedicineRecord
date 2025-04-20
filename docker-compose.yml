@@ -42,10 +42,6 @@ services:
       - "8000:3000"
     stdin_open: true
     tty: true
-    deploy:
-      resources:
-        limits:
-          memory: 6g
 volumes:
   mysql_data:
   uploads_data:
