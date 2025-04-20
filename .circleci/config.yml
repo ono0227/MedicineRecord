@@ -20,6 +20,9 @@ commands:
           name: Install Bundler
           command: gem install bundler
       - run:
+          name: Change to backend directory
+          command: cd backend
+      - run:
           name: Bundle Install
           command: bundle install --jobs=4 --retry=3
 
