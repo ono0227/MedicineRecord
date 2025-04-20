@@ -108,6 +108,9 @@ Rails/BulkChangeTable:
 Rails/Exit:
   Enabled: false
 
+Rails/FilePath:
+  Enabled: false
+
 Rails/HasManyOrHasOneDependent:
   Exclude:
     - "app/models/category.rb"
