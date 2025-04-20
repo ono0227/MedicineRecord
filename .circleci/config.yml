@@ -8,7 +8,7 @@ executors:
           RAILS_ENV: test
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 3
-          BUNDLE_PATH: vendor/bundle
+          BUNDLE_PATH: backend/vendor/bundle
       - image: circleci/mysql:8.0
     working_directory: ~/medicine_record
 
@@ -17,26 +17,19 @@ commands:
     description: Install Ruby dependencies
     steps:
       - run:
-          name: List current directory contents
-          command: ls -l
-      - run:
-          name: List backend directory contents
-          command: ls -l backend
-      - run:
           name: Install Bundler
           command: gem install bundler
       - run:
-          name: Change to backend directory
-          command: cd backend
-      - run:
           name: Bundle Install
-          command: bundle install --jobs=4 --retry=3
+          working_directory: backend
+          command: bundle install --jobs=4 --retry=3 --path vendor/bundle
 
   install_javascript_dependencies:
     description: Install Node.js dependencies
     steps:
       - run:
           name: Yarn Install
+          working_directory: frontend
           command: yarn install --frozen-lockfile --network-concurrency 1
 
   setup_database:
@@ -44,9 +37,11 @@ commands:
     steps:
       - run:
           name: Wait for MySQL to be ready
+          working_directory: backend
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
       - run:
           name: Create and Migrate Database
+          working_directory: backend
           command: |
             bundle exec rails db:create db:migrate
 
@@ -55,6 +50,7 @@ commands:
     steps:
       - run:
           name: Run RSpec
+          working_directory: backend
           command: bundle exec rspec --format progress
 
   run_rubocop:
@@ -62,6 +58,7 @@ commands:
     steps:
       - run:
           name: Run Rubocop
+          working_directory: backend
           command: bundle exec rubocop
 
   run_eslint_and_prettier:
@@ -69,9 +66,11 @@ commands:
     steps:
       - run:
           name: Run ESLint
+          working_directory: frontend
           command: yarn lint:check
       - run:
           name: Run Prettier
+          working_directory: frontend
           command: yarn format:check
 
 jobs:
@@ -92,13 +91,13 @@ jobs:
       - install_ruby_dependencies
       - install_javascript_dependencies
       - save_cache:
-          key: v1-ruby-dependencies-{{ checksum "Gemfile.lock" }}
+          key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
           paths:
-            - vendor/bundle
+            - backend/vendor/bundle
       - save_cache:
-          key: v1-node-dependencies-{{ checksum "yarn.lock" }}
+          key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
           paths:
-            - node_modules
+            - frontend/node_modules
 
   rspec:
     executor: default_container
@@ -106,9 +105,9 @@ jobs:
       - restore_cache:
           key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
-          key: v1-ruby-dependencies-{{ checksum "Gemfile.lock" }}
+          key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
       - restore_cache:
-          key: v1-node-dependencies-{{ checksum "yarn.lock" }}
+          key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
       - setup_database
       - run_rspec
 
@@ -118,7 +117,7 @@ jobs:
       - restore_cache:
           key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
-          key: v1-ruby-dependencies-{{ checksum "Gemfile.lock" }}
+          key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
       - run_rubocop
 
   eslint_and_prettier:
@@ -127,7 +126,7 @@ jobs:
       - restore_cache:
           key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
-          key: v1-node-dependencies-{{ checksum "yarn.lock" }}
+          key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
       - run_eslint_and_prettier
 
 workflows:
