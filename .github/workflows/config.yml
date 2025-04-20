@@ -10,8 +10,8 @@ on:
       - develop*
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  ESLint-and-Prettier:
+    name: ESLint and Prettier
     runs-on: ubuntu-latest
 
     steps:
@@ -26,9 +26,51 @@ jobs:
         uses: actions/checkout@v3
 
       # 3. 環境変数を設定
-      - name: Set environment variables
+      - name: Set common environment variables
+        id: set_envs
         run: |
-          echo "${{ secrets.MASTER_KEY }}" > backend/config/master.key
+          echo "REACT_APP_AUTH_URL=${{ secrets.REACT_APP_AUTH_URL }}" >> frontend/.env.local
+          echo "REACT_APP_SIGN_IN_URL=${{ secrets.REACT_APP_SIGN_IN_URL }}" >> frontend/.env.local
+          echo "REACT_APP_SIGN_OUT_URL=${{ secrets.REACT_APP_SIGN_OUT_URL }}" >> frontend/.env.local
+          echo "REACT_APP_PASSWORD_URL=${{ secrets.REACT_APP_PASSWORD_URL }}" >> frontend/.env.local
+          echo "REACT_APP_UPDATE_PASSWORD_URL=${{ secrets.REACT_APP_UPDATE_PASSWORD_URL }}" >> frontend/.env.local
+          echo "REACT_APP_LISTEN_AUTH_STATE_URL=${{ secrets.REACT_APP_LISTEN_AUTH_STATE_URL }}" >> frontend/.env.local
+          echo "REACT_APP_MEDICINES_URL=${{ secrets.REACT_APP_MEDICINES_URL }}" >> frontend/.env.local
+          echo "REACT_APP_POSTS_URL=${{ secrets.REACT_APP_POSTS_URL }}" >> frontend/.env.local
+          echo "REACT_APP_CATEGORIES_URL=${{ secrets.REACT_APP_CATEGORIES_URL }}" >> frontend/.env.local
+          echo "REACT_APP_WEBHOOK_URL=${{ secrets.REACT_APP_WEBHOOK_URL }}" >> frontend/.env.local
+
+      # 4. Docker コンテナをビルドして起動
+      - name: Build front image
+        run: docker compose build --no-cache front
+
+      # 5. ESLint チェックを実行
+      - name: Run ESLint
+        run: docker run --rm -v ${{ github.workspace }}/frontend:/app front yarn lint:check
+
+      # 6. Prettier チェックを実行
+      - name: Run Prettier
+        run: docker run --rm -v ${{ github.workspace }}/frontend:/app front yarn format:check
+
+  Rspec-and-Rubocop:
+    name: RSpec and Rubocop
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Docker CLI と Docker Compose プラグインの確認
+      - name: Check Docker CLI version
+        run: |
+          docker --version
+          docker compose version
+
+      # 2. レポジトリを導入
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 3. 環境変数を設定
+      - name: Set common environment variables
+        id: set_envs
+        run: |
           echo "REACT_APP_AUTH_URL=${{ secrets.REACT_APP_AUTH_URL }}" >> frontend/.env.local
           echo "REACT_APP_SIGN_IN_URL=${{ secrets.REACT_APP_SIGN_IN_URL }}" >> frontend/.env.local
           echo "REACT_APP_SIGN_OUT_URL=${{ secrets.REACT_APP_SIGN_OUT_URL }}" >> frontend/.env.local
@@ -46,14 +88,19 @@ jobs:
           docker compose build --no-cache
           docker compose up -d
 
-      # 5. データベース接続を待機 (MySQL が起動したか確認)
+      # 5. master.key を上書き
+      - name: Override master.key
+        run: |
+          echo "${{ secrets.MASTER_KEY }}" > backend/config/master.key
+
+      # 6. データベース接続を待機 (MySQL が起動したか確認)
       - name: Wait for DB connection
         run: |
           for i in {1..120}; do
             docker compose exec -T db mysql -uroot -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "SELECT 1;" && break || sleep 5
           done
 
-      # 6. データベースのセットアップ
+      # 7. データベースのセットアップ
       - name: Create DB
         run: docker compose exec -T back rails db:create
 
@@ -63,25 +110,9 @@ jobs:
       - name: Load seed data
         run: docker compose exec -T back rails db:seed
 
-      # 7. 静的解析とテストの実行
+      # 8. 静的解析とテストの実行
       - name: Run Rubocop
         run: docker compose exec -T back bundle exec rubocop
 
       - name: Run RSpec
         run: docker compose exec -T back bin/rspec
-
-      # 8. Frontのコンテナのログを確認
-      - name: Check front container logs
-        run: docker compose logs front
-
-      # 9. Frontのコンテナを再起動
-      - name: Restart front container
-        run: docker compose up -d front
-
-      # 10. ESLint チェックを実行
-      - name: Run ESLint
-        run: docker compose exec -T front yarn lint:check
-
-      # 11. Prettier チェックを実行
-      - name: Run Prettier
-        run: docker compose exec -T front yarn format:check
