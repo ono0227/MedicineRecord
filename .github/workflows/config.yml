@@ -39,26 +39,26 @@ jobs:
           echo "REACT_APP_POSTS_URL=${{ secrets.REACT_APP_POSTS_URL }}" >> frontend/.env.local
           echo "REACT_APP_CATEGORIES_URL=${{ secrets.REACT_APP_CATEGORIES_URL }}" >> frontend/.env.local
           echo "REACT_APP_WEBHOOK_URL=${{ secrets.REACT_APP_WEBHOOK_URL }}" >> frontend/.env.local
-          echo "${{ secrets.MASTER_KEY }}" > backend/temp_master.key
+          echo "${{ secrets.MASTER_KEY }}" > backend/config/master.key
 
       # 4. Docker コンテナをビルドして起動 (フロントエンドのみ)
       - name: Build and run front container
         id: build_front
         run: |
-          if ! docker images -q front; then
-            docker compose build --no-cache front
-          fi
+          docker compose build --no-cache front
           docker compose up -d front
-          IMAGE_ID=$(docker images -q front)
-          echo "::set-output name=image_id::$IMAGE_ID"
 
-      # 5. ESLint チェックを実行
+      # 5. 依存関係をインストール
+      - name: Install dependencies
+        run: docker compose exec -T front yarn install
+
+      # 6. ESLint チェックを実行
       - name: Run ESLint
-        run: docker run --rm -v ${{ github.workspace }}/frontend:/app ${{ steps.build_front.outputs.image_id }} yarn lint:check
+        run: docker compose exec -T front yarn lint:check
 
-      # 6. Prettier チェックを実行
+      # 7. Prettier チェックを実行
       - name: Run Prettier
-        run: docker run --rm -v ${{ github.workspace }}/frontend:/app ${{ steps.build_front.outputs.image_id }} yarn format:check
+        run: docker compose exec -T front yarn format:check
 
   Rspec-and-Rubocop:
     name: RSpec and Rubocop
@@ -89,29 +89,24 @@ jobs:
           echo "REACT_APP_POSTS_URL=${{ secrets.REACT_APP_POSTS_URL }}" >> frontend/.env.local
           echo "REACT_APP_CATEGORIES_URL=${{ secrets.REACT_APP_CATEGORIES_URL }}" >> frontend/.env.local
           echo "REACT_APP_WEBHOOK_URL=${{ secrets.REACT_APP_WEBHOOK_URL }}" >> frontend/.env.local
-          echo "${{ secrets.MASTER_KEY }}" > backend/temp_master.key
+          echo "${{ secrets.MASTER_KEY }}" > backend/config/master.key
 
       # 4. Docker コンテナをビルドして起動
       - name: Build and run Docker containers
         run: |
           mkdir -p backend/config
-          cp backend/temp_master.key backend/config/master.key
-          docker compose build --no-cache
-          docker compose up -d
-
-      # 5. master.key を上書き
-      - name: Override master.key
-        run: |
           echo "${{ secrets.MASTER_KEY }}" > backend/config/master.key
+          RAILS_ENV=test docker compose build --no-cache
+          RAILS_ENV=test docker compose up -d
 
-      # 6. データベース接続を待機 (MySQL が起動したか確認)
+      # 5. データベース接続を待機 (MySQL が起動したか確認)
       - name: Wait for DB connection
         run: |
           for i in {1..120}; do
             docker compose exec -T db mysql -uroot -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "SELECT 1;" && break || sleep 5
           done
 
-      # 7. データベースのセットアップ
+      # 6. データベースのセットアップ
       - name: Create DB
         run: docker compose exec -T back rails db:create
 
@@ -121,7 +116,7 @@ jobs:
       - name: Load seed data
         run: docker compose exec -T back rails db:seed
 
-      # 8. 静的解析とテストの実行
+      # 7. 静的解析とテストの実行
       - name: Run Rubocop
         run: docker compose exec -T back bundle exec rubocop
 
