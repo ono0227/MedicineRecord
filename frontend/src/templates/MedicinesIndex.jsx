@@ -11,6 +11,7 @@ import { NavigateTabs } from '../components/UIkit'
 import { fetchMedicines } from '../reducks/medicines/operations'
 import { getMedicines } from '../reducks/medicines/selectors'
 
+//サイズを調整
 const MedicinesIndexContainer = styled('div')(({ theme }) => ({
   minHeight: `calc(100vh - 60px - 80px)`,
   paddingBottom: theme.spacing(4),

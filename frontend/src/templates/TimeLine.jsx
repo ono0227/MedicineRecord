@@ -19,6 +19,7 @@ const RefreshButton = styled(IconButton)(({ theme }) => ({
   zIndex: 1000,
 }))
 
+//サイズを調整
 const TimelineContainer = styled('div')(({ theme }) => ({
   minHeight: `calc(100vh - 60px - 80px)`,
   paddingBottom: theme.spacing(4),
