@@ -42,12 +42,14 @@ jobs:
           echo "${{ secrets.MASTER_KEY }}" > backend/temp_master.key
 
       # 4. Docker コンテナをビルドして起動
-      - name: Build and run Docker containers
+      - name: Build and run Docker containers and get image ID
+        id: build_front
         run: |
-          mkdir -p backend/config
-          cp backend/temp_master.key backend/config/master.key
           docker compose build --no-cache
           docker compose up -d front
+          # イメージIDを取得して出力
+          IMAGE_ID=$(docker images -q front)
+          echo "::set-output name=image_id::$IMAGE_ID"
 
       # 5. ESLint チェックを実行
       - name: Run ESLint
