@@ -17,6 +17,12 @@ commands:
     description: Install Ruby dependencies
     steps:
       - run:
+          name: List current directory contents
+          command: ls -l
+      - run:
+          name: List backend directory contents
+          command: ls -l backend
+      - run:
           name: Install Bundler
           command: gem install bundler
       - run:
