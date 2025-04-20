@@ -43,6 +43,7 @@ commands:
           name: Create and Migrate Database
           working_directory: backend
           command: |
+            source <(bundle env | grep 'BUNDLE_PATH' | sed -E 's/.*:\s*(.*)/\1/g')/bin/activate
             bundle exec rails db:create db:migrate
 
   run_rspec:
@@ -51,7 +52,9 @@ commands:
       - run:
           name: Run RSpec
           working_directory: backend
-          command: bundle exec rspec --format progress
+          command: |
+            source <(bundle env | grep 'BUNDLE_PATH' | sed -E 's/.*:\s*(.*)/\1/g')/bin/activate
+            bundle exec rspec --format progress
 
   run_rubocop:
     description: Run Rubocop
@@ -59,7 +62,9 @@ commands:
       - run:
           name: Run Rubocop
           working_directory: backend
-          command: bundle exec rubocop
+          command: |
+            source <(bundle env | grep 'BUNDLE_PATH' | sed -E 's/.*:\s*(.*)/\1/g')/bin/activate
+            bundle exec rubocop
 
   run_eslint_and_prettier:
     description: Run ESLint and Prettier
