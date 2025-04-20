@@ -9,7 +9,6 @@ executors:
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 3
           BUNDLE_PATH: backend/vendor/bundle
-          PATH: "${PATH}:${PWD}/backend/vendor/bundle/bin"
       - image: circleci/mysql:8.0
     working_directory: ~/medicine_record
 
@@ -43,7 +42,9 @@ commands:
       - run:
           name: Create and Migrate Database
           working_directory: backend
-          command: bundle exec rails db:create db:migrate
+          command: |
+            bundle install --path vendor/bundle
+            bundle exec rails db:create db:migrate
 
   run_rspec:
     description: Run RSpec tests
@@ -51,7 +52,9 @@ commands:
       - run:
           name: Run RSpec
           working_directory: backend
-          command: bundle exec rspec --format progress
+          command: |
+            bundle install --path vendor/bundle
+            bundle exec rspec --format progress
 
   run_rubocop:
     description: Run Rubocop
@@ -59,7 +62,9 @@ commands:
       - run:
           name: Run Rubocop
           working_directory: backend
-          command: bundle exec rubocop
+          command: |
+            bundle install --path vendor/bundle
+            bundle exec rubocop
 
   run_eslint_and_prettier:
     description: Run ESLint and Prettier
