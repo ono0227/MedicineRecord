@@ -50,7 +50,7 @@ jobs:
 
       # 5. 依存関係をインストール
       - name: Install dependencies
-        run: docker compose exec -T front yarn install
+        run: docker compose exec -T front yarn install --network-concurrency 1
 
       # 6. ESLint チェックを実行
       - name: Run ESLint
@@ -96,8 +96,10 @@ jobs:
         run: |
           mkdir -p backend/config
           echo "${{ secrets.MASTER_KEY }}" > backend/config/master.key
-          RAILS_ENV=test docker compose build --no-cache
-          RAILS_ENV=test docker compose up -d
+          docker compose build --no-cache
+          docker compose up -d
+        env:
+          RAILS_ENV: test
 
       # 5. データベース接続を待機 (MySQL が起動したか確認)
       - name: Wait for DB connection
@@ -105,20 +107,32 @@ jobs:
           for i in {1..120}; do
             docker compose exec -T db mysql -uroot -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "SELECT 1;" && break || sleep 5
           done
+        env:
+          RAILS_ENV: test
 
       # 6. データベースのセットアップ
       - name: Create DB
         run: docker compose exec -T back rails db:create
+        env:
+          RAILS_ENV: test
 
       - name: Run migrations
         run: docker compose exec -T back rails db:migrate
+        env:
+          RAILS_ENV: test
 
       - name: Load seed data
         run: docker compose exec -T back rails db:seed
+        env:
+          RAILS_ENV: test
 
       # 7. 静的解析とテストの実行
       - name: Run Rubocop
         run: docker compose exec -T back bundle exec rubocop
+        env:
+          RAILS_ENV: test
 
       - name: Run RSpec
         run: docker compose exec -T back bin/rspec
+        env:
+          RAILS_ENV: test
