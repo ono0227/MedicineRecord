@@ -11,7 +11,6 @@ executors:
           BUNDLE_PATH: backend/vendor/bundle
       - image: circleci/mysql:8.0
         environment:
-          MYSQL_USER: root
           MYSQL_ROOT_PASSWORD: password
     working_directory: ~/medicine_record
 
@@ -41,7 +40,7 @@ commands:
       - run:
           name: Wait for MySQL to be ready
           working_directory: backend
-          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
+          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 180s
       - run:
           name: Create and Migrate Database
           working_directory: backend
