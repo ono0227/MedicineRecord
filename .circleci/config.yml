@@ -94,9 +94,13 @@ jobs:
           paths:
             - frontend/node_modules
       - run:
+          name: Create backend/config directory if it doesn't exist
+          command: |
+            mkdir -p backend/config
+      - run:
           name: Set the master key
           command: |
-            echo $MASTER_KEY > config/masterkey
+            echo $MASTER_KEY > backend/config/masterkey
 
   rspec:
     executor: default_container
