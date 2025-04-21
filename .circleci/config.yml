@@ -1,0 +1,161 @@
+version: 2.1
+
+executors:
+  default_container:
+    docker:
+      - image: cimg/ruby:3.2-node
+        environment:
+          RAILS_ENV: test
+          BUNDLE_JOBS: 4
+          BUNDLE_RETRY: 3
+          BUNDLE_PATH: backend/vendor/bundle
+      - image: circleci/mysql:8.0
+        environment:
+          MYSQL_ROOT_PASSWORD: password
+    working_directory: ~/medicine_record
+
+commands:
+  install_ruby_dependencies:
+    description: Install Ruby dependencies
+    steps:
+      - run:
+          name: Install Bundler
+          command: gem install bundler
+      - run:
+          name: Bundle Install
+          working_directory: backend
+          command: bundle install --jobs=4 --retry=3 --path vendor/bundle
+
+  install_javascript_dependencies:
+    description: Install Node.js dependencies
+    steps:
+      - run:
+          name: Yarn Install
+          working_directory: frontend
+          command: yarn install --frozen-lockfile --network-concurrency 1
+
+  setup_database:
+    description: Setup MySQL database
+    steps:
+      - run:
+          name: Wait for MySQL to be ready
+          working_directory: backend
+          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 180s
+      - run:
+          name: Create and Migrate Database
+          working_directory: backend
+          command: |
+            bundle install --path vendor/bundle
+            bundle exec rails db:create
+            bundle exec rails db:migrate
+            bundle exec rails db:seed
+
+  run_rspec:
+    description: Run RSpec tests
+    steps:
+      - run:
+          name: Run RSpec
+          working_directory: backend
+          command: |
+            bundle install --path vendor/bundle
+            bundle exec rspec --format progress
+
+  run_rubocop:
+    description: Run Rubocop
+    steps:
+      - run:
+          name: Run Rubocop
+          working_directory: backend
+          command: |
+            bundle install --path vendor/bundle
+            bundle exec rubocop --config .rubocop.yml --force-exclusion
+
+  run_eslint_and_prettier:
+    description: Run ESLint and Prettier
+    steps:
+      - run:
+          name: Run ESLint
+          working_directory: frontend
+          command: yarn lint:check
+      - run:
+          name: Run Prettier
+          working_directory: frontend
+          command: yarn format:check
+
+jobs:
+  fetch_source_code:
+    executor: default_container
+    steps:
+      - checkout
+      - save_cache:
+          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/medicine_record
+
+  install_dependencies:
+    executor: default_container
+    steps:
+      - restore_cache:
+          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+      - install_ruby_dependencies
+      - install_javascript_dependencies
+      - save_cache:
+          key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
+          paths:
+            - backend/vendor/bundle
+      - save_cache:
+          key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
+          paths:
+            - frontend/node_modules
+
+  rspec:
+    executor: default_container
+    steps:
+      - restore_cache:
+          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
+      - restore_cache:
+          key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
+      - run:
+          name: Copy database.yml for CI
+          working_directory: backend/config
+          command: mv database.yml.ci database.yml
+      - setup_database
+      - run_rspec
+
+  rubocop:
+    executor: default_container
+    steps:
+      - restore_cache:
+          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
+      - run_rubocop
+
+  eslint_and_prettier:
+    executor: default_container
+    steps:
+      - restore_cache:
+          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
+      - run_eslint_and_prettier
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - fetch_source_code
+      - install_dependencies:
+          requires:
+            - fetch_source_code
+      - rspec:
+          requires:
+            - install_dependencies
+      - rubocop:
+          requires:
+            - install_dependencies
+      - eslint_and_prettier:
+          requires:
+            - install_dependencies

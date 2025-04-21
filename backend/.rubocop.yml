@@ -8,11 +8,11 @@ AllCops:
     - "app/channels/**/*"
     - "app/jobs/**/*"
     - "app/mailers/**/*"
-    - "bin/**/*"
+    - "bin/*"
     - "config/environments/*"
     - "config/locales/*"
-    - "db/schema.rb"
     - "db/migrate/*"
+    - "db/schema.rb"
     - "lib/**/*"
     - "log/**/*"
     - "storage/**/*"
@@ -21,6 +21,7 @@ AllCops:
     - "vendor/**/*"
     - "config.ru"
     - "Rakefile"
+    - "backend/vendor/bundle/**/*"
 
 Layout/ClassStructure:
   Enabled: true
