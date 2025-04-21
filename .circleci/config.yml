@@ -9,7 +9,6 @@ executors:
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 3
           BUNDLE_PATH: backend/vendor/bundle
-      - image: circleci/mysql:8.0
     working_directory: ~/medicine_record
 
 commands:
@@ -33,20 +32,11 @@ commands:
           command: yarn install --frozen-lockfile --network-concurrency 1
 
   setup_database:
-    description: Setup MySQL database
+    description: Setup MySQL database using docker-compose
     steps:
       - run:
           name: Wait for MySQL to be ready
-          working_directory: backend
-          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
-      - run:
-          name: Create and Migrate Database
-          working_directory: backend
-          command: |
-            bundle install --path vendor/bundle
-            bundle exec rails db:create
-            bundle exec rails db:migrate
-            bundle exec rails db:seed
+          command: dockerize -wait tcp://db:3306 -timeout 120s
 
   run_rspec:
     description: Run RSpec tests
@@ -62,15 +52,9 @@ commands:
     description: Run Rubocop
     steps:
       - run:
-          name: List backend directory
+          name: Run Rubocop inside backend container
           working_directory: backend
-          command: ls -al
-      - run:
-          name: Run Rubocop
-          working_directory: backend
-          command: |
-            bundle install --path vendor/bundle
-            bundle exec rubocop --config .rubocop.yml
+          command: bundle exec rubocop --config .rubocop.yml
 
   run_eslint_and_prettier:
     description: Run ESLint and Prettier
@@ -113,31 +97,54 @@ jobs:
   rspec:
     executor: default_container
     steps:
-      - restore_cache:
-          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
-      - restore_cache:
-          key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
-      - restore_cache:
-          key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
+      - setup_remote_docker
+      - checkout
       - run:
-          name: Copy database.yml for CI
-          working_directory: backend/config
-          command: cp database.yml.ci database.yml
-      - setup_database
+          name: Copy CI database configuration
+          command: cp config/database.yml.ci config/database.yml
+      - run:
+          name: Copy CI docker-compose file
+          command: cp docker-compose.yml.ci docker-compose.yml
+      - run:
+          name: Build and start MySQL service
+          command: docker-compose up -d db
+      - run:
+          name: Wait for MySQL to be ready
+          command: dockerize -wait tcp://db:3306 -timeout 120s
+      - run:
+          name: Create and Migrate Database
+          working_directory: backend
+          command: |
+            bundle install --path vendor/bundle
+            bundle exec rails db:create
+            bundle exec rails db:migrate
+            bundle exec rails db:seed
       - run_rspec
       - run:
-          name: Restore original database.yml
-          working_directory: backend/config
-          command: git checkout -- database.yml
+          name: Stop services
+          command: docker-compose down
 
   rubocop:
     executor: default_container
     steps:
-      - restore_cache:
-          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
-      - restore_cache:
-          key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Copy CI database configuration
+          command: cp config/database.yml.ci config/database.yml
+      - run:
+          name: Copy CI docker-compose file
+          command: cp docker-compose.yml.ci docker-compose.yml
+      - run:
+          name: Build and start services (including backend for rubocop)
+          command: docker-compose up -d back
+      - run:
+          name: Wait for backend to be ready (optional, but might help)
+          command: dockerize -wait http://localhost:3000 -timeout 60s || true
       - run_rubocop
+      - run:
+          name: Stop services
+          command: docker-compose down
 
   eslint_and_prettier:
     executor: default_container
