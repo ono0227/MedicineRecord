@@ -36,19 +36,17 @@ commands:
     description: Setup MySQL database
     steps:
       - run:
-        name: Wait for MySQL to be ready
-        working_directory: backend
-        command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
+          name: Wait for MySQL to be ready
+          working_directory: backend
+          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
       - run:
-        name: Check MySQL connection
-        working_directory: backend
-        command: mysql -h 127.0.0.1 -P 3306 -u root -p password -e "SELECT 1;"
-      - run:
-        name: Create and Migrate Database
-        working_directory: backend
-        command: |
-          bundle install --path vendor/bundle
-          bundle exec rails db:create db:migrate db:seed
+          name: Create and Migrate Database
+          working_directory: backend
+          command: |
+            bundle install --path vendor/bundle
+            bundle exec rails db:create --host=127.0.0.1
+            bundle exec rails db:migrate
+            bundle exec rails db:seed
 
   run_rspec:
     description: Run RSpec tests
