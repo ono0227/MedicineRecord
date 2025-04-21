@@ -5,8 +5,136 @@ require:
 
 AllCops:
   Exclude:
+    - "app/channels/**/*"
+    - "app/jobs/**/*"
+    - "app/mailers/**/*"
+    - "bin/*"
+    - "config/environments/*"
+    - "config/locales/*"
+    - "db/migrate/*"
+    - "db/schema.rb"
+    - "lib/**/*"
+    - "log/**/*"
+    - "storage/**/*"
+    - "test/**/*"
+    - "tmp/**/*"
+    - "config.ru"
+    - "Rakefile"
     - "backend/vendor/bundle/**/*"
-    - "vendor/**/*"
 
-Style/StringLiterals:
+Layout/ClassStructure:
   Enabled: true
+
+Layout/LineLength:
+  Max: 160
+  Exclude:
+    - "db/migrate/*.rb"
+
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "spec/**/*_spec.rb"
+
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/BlockLength:
+  Exclude:
+    - "**/*.rake"
+    - "spec/**/*.rb"
+    - "Gemfile"
+    - "config/environments/*.rb"
+    - "config/routes.rb"
+    - "app/model/user.rb"
+    - "db/seeds.rb"
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/MethodLength:
+  Max: 20
+  Exclude:
+    - "db/migrate/*.rb"
+
+Naming/PredicateName:
+  ForbiddenPrefixes:
+    - "is_"
+    - "have_"
+  NamePrefix:
+    - "is_"
+    - "have_"
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/GuardClause:
+  MinBodyLength: 5
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/MethodCalledOnDoEndBlock:
+  Enabled: true
+
+Style/OrAssignment:
+  Enabled: false
+
+Style/SafeNavigation:
+  Enabled: false
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/WordArray:
+  Enabled: false
+
+Style/ZeroLengthPredicate:
+  Enabled: false
+
+Rails/ActiveRecordCallbacksOrder:
+  Enabled: true
+
+Rails/BulkChangeTable:
+  Enabled: false
+
+Rails/Exit:
+  Enabled: false
+
+Rails/FilePath:
+  Enabled: false
+
+Rails/HasManyOrHasOneDependent:
+  Exclude:
+    - "app/models/category.rb"
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 30
+
+RSpec/ImplicitExpect:
+  Enabled: false
+
+RSpec/InstanceVariable:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 8
