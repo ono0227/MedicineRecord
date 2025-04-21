@@ -44,7 +44,7 @@ commands:
           working_directory: backend
           command: |
             bundle install --path vendor/bundle
-            bundle exec rails db:create db:migrate
+            bundle exec rails db:create db:migrate db:seed
 
   run_rspec:
     description: Run RSpec tests
@@ -60,11 +60,15 @@ commands:
     description: Run Rubocop
     steps:
       - run:
+          name: List backend directory
+          working_directory: backend
+          command: ls -al
+      - run:
           name: Run Rubocop
           working_directory: backend
           command: |
             bundle install --path vendor/bundle
-            bundle exec rubocop
+            bundle exec rubocop --config .rubocop.yml
 
   run_eslint_and_prettier:
     description: Run ESLint and Prettier
@@ -114,7 +118,15 @@ jobs:
       - restore_cache:
           key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
       - setup_database
+      - run:
+          name: Copy database.yml for CI
+          working_directory: backend/config
+          command: cp database.yml.ci database.yml
       - run_rspec
+      - run:
+          name: Restore original database.yml
+          working_directory: backend/config
+          command: git checkout -- database.yml
 
   rubocop:
     executor: default_container
