@@ -22,8 +22,6 @@ AllCops:
     - "config.ru"
     - "Rakefile"
 
-NewCops: disable
-
 Layout/ClassStructure:
   Enabled: true
 

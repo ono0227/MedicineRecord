@@ -40,6 +40,10 @@ commands:
           working_directory: backend
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
       - run:
+        name: Check MySQL connection
+        working_directory: backend
+        command: mysql -h 127.0.0.1 -P 3306 -u root -p password -e "SELECT 1;"
+      - run:
           name: Create and Migrate Database
           working_directory: backend
           command: |
