@@ -7,6 +7,10 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
+    networks:
+      default:
+        aliases:
+          - db
 
   back:
     build:
@@ -31,3 +35,8 @@ volumes:
   mysql_data:
   uploads_data:
   tmp_data:
+
+networks:
+  default:
+    external:
+      name: medicine_record_network
