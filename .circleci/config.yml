@@ -64,11 +64,15 @@ commands:
     description: Run Rubocop
     steps:
       - run:
+          name: Clear Rubocop cache
+          working_directory: backend
+          command: rm -rf /home/circleci/.cache/rubocop_cache/*
+      - run:
           name: Run Rubocop
           working_directory: backend
           command: |
             bundle install --path vendor/bundle
-            bundle exec rubocop --config .rubocop.yml --debug
+            bundle exec rubocop --config .rubocop.yml --force-exclusion --debug
 
   run_eslint_and_prettier:
     description: Run ESLint and Prettier
