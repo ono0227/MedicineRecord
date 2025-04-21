@@ -119,11 +119,11 @@ jobs:
           key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
       - restore_cache:
           key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
-      - setup_database
       - run:
           name: Copy database.yml for CI
           working_directory: backend/config
           command: cp database.yml.ci database.yml
+      - setup_database
       - run_rspec
       - run:
           name: Restore original database.yml
