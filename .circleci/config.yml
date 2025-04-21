@@ -98,7 +98,7 @@ jobs:
     executor: default_container
     steps:
       - restore_cache:
-          key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
       - install_ruby_dependencies
       - install_javascript_dependencies
       - save_cache:
@@ -114,7 +114,7 @@ jobs:
     executor: default_container
     steps:
       - restore_cache:
-          key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
       - restore_cache:
@@ -134,7 +134,7 @@ jobs:
     executor: default_container
     steps:
       - restore_cache:
-          key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           key: v1-ruby-dependencies-{{ checksum "backend/Gemfile.lock" }}
       - run_rubocop
@@ -143,7 +143,7 @@ jobs:
     executor: default_container
     steps:
       - restore_cache:
-          key: v1-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-medicine_record-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
       - run_eslint_and_prettier
