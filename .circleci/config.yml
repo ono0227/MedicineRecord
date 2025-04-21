@@ -72,7 +72,7 @@ commands:
           working_directory: backend
           command: |
             bundle install --path vendor/bundle
-            bundle exec rubocop --config .rubocop.yml --force-exclusion --debug
+            bundle exec rubocop --config .rubocop.yml --force-exclusion
 
   run_eslint_and_prettier:
     description: Run ESLint and Prettier
