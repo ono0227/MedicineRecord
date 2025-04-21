@@ -64,10 +64,6 @@ commands:
     description: Run Rubocop
     steps:
       - run:
-          name: Clear Rubocop cache
-          working_directory: backend
-          command: rm -rf /home/circleci/.cache/rubocop_cache/*
-      - run:
           name: Run Rubocop
           working_directory: backend
           command: |
