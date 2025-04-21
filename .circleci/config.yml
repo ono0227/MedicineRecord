@@ -101,7 +101,7 @@ jobs:
       - checkout
       - run:
           name: Copy CI database configuration
-          command: cp config/database.yml.ci config/database.yml
+          command: cp backend/config/database.yml.ci backend/config/database.yml
       - run:
           name: Copy CI docker-compose file
           command: cp docker-compose.yml.ci docker-compose.yml
@@ -131,7 +131,7 @@ jobs:
       - checkout
       - run:
           name: Copy CI database configuration
-          command: cp config/database.yml.ci config/database.yml
+          command: cp backend/config/database.yml.ci backend/config/database.yml
       - run:
           name: Copy CI docker-compose file
           command: cp docker-compose.yml.ci docker-compose.yml
