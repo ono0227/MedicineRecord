@@ -3,13 +3,17 @@ import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import React, { useState, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { TextInput, PrimaryButton } from '../components/UIkit'
 import { updatePassword } from '../reducks/users/operations'
 
 const UpdatePassword = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  // URL から reset_password_token という名前のパラメータの値を取得
+  const token = searchParams.get('reset_password_token')
 
   const [password, setPassword] = useState(''),
     [confirmPassword, setComfirmPassword] = useState('')
@@ -29,8 +33,13 @@ const UpdatePassword = () => {
   )
 
   const handleUpdatePassword = () => {
-    dispatch(updatePassword(password, confirmPassword))
-    navigate('/signin')
+    if (token) {
+      dispatch(updatePassword(password, confirmPassword, token))
+      navigate('/signin')
+    } else {
+      alert('パスワード再設定トークンが無効です。もう一度、再設定のメールからアクセスしてください。')
+      navigate('/signin')
+    }
   }
 
   return (

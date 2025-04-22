@@ -285,7 +285,7 @@ export const sendPasswordURL = (email) => {
   }
 }
 
-export const updatePassword = (password, confirmPassword) => {
+export const updatePassword = (password, confirmPassword, token) => {
   return async (dispatch) => {
     if (password === '') {
       alert('パスワードを入力してください')
@@ -300,6 +300,7 @@ export const updatePassword = (password, confirmPassword) => {
       await axios.put(passwordUrl, {
         password: password,
         password_confirmation: confirmPassword,
+        reset_password_token: token,
       })
     } catch (error) {
       console.error('Can not reset password', error)
