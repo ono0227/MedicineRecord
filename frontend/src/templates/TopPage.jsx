@@ -17,7 +17,7 @@ const TopPage = () => {
 
   return (
     <Container maxWidth="md">
-      <Box sx={{ mt: 4 }}>
+      <Box sx={{ mt: 0 }}>
         <Typography variant="subtitle2" gutterBottom>
           あなたの服薬をサポート！
         </Typography>
