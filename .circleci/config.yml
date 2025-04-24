@@ -5,7 +5,6 @@ executors:
     docker:
       - image: cimg/ruby:3.2-node
         environment:
-          RAILS_ENV: test
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 3
           BUNDLE_PATH: backend/vendor/bundle
@@ -34,16 +33,26 @@ commands:
           working_directory: frontend
           command: yarn install --frozen-lockfile --network-concurrency 1
 
-  setup_database:
-    description: Setup MySQL database
+  build_react_app:
+    description: Build React application
+    steps:
+      - run:
+          name: Build React App
+          working_directory: frontend
+          command: yarn build
+
+  setup_test_database:
+    description: Setup MySQL database for testing
     steps:
       - run:
           name: Wait for MySQL to be ready
           working_directory: backend
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 180s
       - run:
-          name: Create and Migrate Database
+          name: Create and Migrate Test Database
           working_directory: backend
+          environment:
+            RAILS_ENV: test
           command: |
             bundle install --path vendor/bundle
             bundle exec rails db:create
@@ -56,6 +65,8 @@ commands:
       - run:
           name: Run RSpec
           working_directory: backend
+          environment:
+            RAILS_ENV: test
           command: |
             bundle install --path vendor/bundle
             bundle exec rspec --format progress
@@ -121,7 +132,7 @@ jobs:
           name: Copy database.yml for CI
           working_directory: backend/config
           command: mv database.yml.ci database.yml
-      - setup_database
+      - setup_test_database
       - run_rspec
 
   rubocop:
@@ -142,6 +153,42 @@ jobs:
           key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
       - run_eslint_and_prettier
 
+  deploy_ec2:
+    executor: default_container
+    steps:
+      - checkout
+      - run:
+          name: Install SSH Client
+          command: sudo apt-get update && sudo apt-get install -y openssh-client
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:FeYaYDVvMAFXTN9B2j73Ufk1akd44ppGpoC536tGeFo"
+      - run:
+          name: Deploy to EC2 Instance(s)
+          environment:
+            RAILS_ENV: production
+          command: |
+            set -e
+            HOSTS="43.206.225.98"
+            USERNAME="ec2-user"
+            APP_PATH="/var/www/medicine_record"
+
+            echo "Building React App..."
+            cd ${APP_PATH}/frontend
+            yarn build
+            echo "Copying React build to Rails public directory..."
+            mkdir -p ${APP_PATH}/backend/public/frontend
+            rsync -av --delete ${APP_PATH}/frontend/build/ ${APP_PATH}/backend/public/frontend/
+
+            echo "Deploying Rails App..."
+            cd ${APP_PATH}/backend
+            git pull origin main
+            bundle install --without development test --deployment
+            rails db:migrate
+            rails assets:precompile
+            sudo systemctl restart your_rails_app_service
+            echo "Deployment to $HOST complete."
+
 workflows:
   version: 2
   build_and_test:
@@ -150,6 +197,12 @@ workflows:
       - install_dependencies:
           requires:
             - fetch_source_code
+      - build_react_app:
+          requires:
+            - install_dependencies
+      - setup_test_database:
+          requires:
+            - install_dependencies
       - rspec:
           requires:
             - install_dependencies
@@ -159,3 +212,12 @@ workflows:
       - eslint_and_prettier:
           requires:
             - install_dependencies
+      - deploy_ec2:
+          requires:
+            - rspec
+            - rubocop
+            - eslint_and_prettier
+          filters:
+            branches:
+              only:
+                - main
