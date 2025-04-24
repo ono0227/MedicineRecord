@@ -48,11 +48,12 @@ group :development, :test do
   gem 'pry-byebug'
 end
 
+gem 'carrierwave'
+
 gem 'devise'
 gem 'devise_token_auth'
 
-gem 'carrierwave'
-gem 'mini_magick'
 gem 'fog-aws'
+gem 'mini_magick'
 
 gem 'rails-erd'
