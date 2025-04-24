@@ -33,14 +33,6 @@ commands:
           working_directory: frontend
           command: yarn install --frozen-lockfile --network-concurrency 1
 
-  build_react_app:
-    description: Build React application
-    steps:
-      - run:
-          name: Build React App
-          working_directory: frontend
-          command: yarn build
-
   setup_test_database:
     description: Setup MySQL database for testing
     steps:
@@ -164,30 +156,50 @@ jobs:
           fingerprints:
             - "SHA256:FeYaYDVvMAFXTN9B2j73Ufk1akd44ppGpoC536tGeFo"
       - run:
-          name: Deploy to EC2 Instance(s)
-          environment:
-            RAILS_ENV: production
+          name: Deploy to EC2 via SSH
           command: |
             set -e
-            HOSTS="43.206.225.98"
+            HOST="43.206.225.98"
             USERNAME="ec2-user"
             APP_PATH="/var/www/medicine_record"
+            GITHUB_USERNAME="your-github-username"
+            REPOSITORY_NAME="your-repository-name"
+            BRANCH_NAME="main"
 
-            echo "Building React App..."
-            cd ${APP_PATH}/frontend
-            yarn build
-            echo "Copying React build to Rails public directory..."
-            mkdir -p ${APP_PATH}/backend/public/frontend
-            rsync -av --delete ${APP_PATH}/frontend/build/ ${APP_PATH}/backend/public/frontend/
+            ssh -o StrictHostKeyChecking=no ${USERNAME}@${HOST} << EOF
+              echo "Creating application directory..."
+              mkdir -p ${APP_PATH}/backend
 
-            echo "Deploying Rails App..."
-            cd ${APP_PATH}/backend
-            git pull origin main
-            bundle install --without development test --deployment
-            rails db:migrate
-            rails assets:precompile
-            sudo systemctl restart your_rails_app_service
-            echo "Deployment to $HOST complete."
+              echo "Cloning repository..."
+              cd ${APP_PATH}/backend
+              git clone -b ${BRANCH_NAME} --depth 1 git@github.com:${GITHUB_USERNAME}/${REPOSITORY_NAME}.git .
+
+              echo "Installing backend dependencies..."
+              bundle install --without development test --deployment
+
+              echo "Installing frontend dependencies..."
+              cd ${APP_PATH}/frontend
+              yarn install --frozen-lockfile --network-concurrency 1
+
+              echo "Building React App..."
+              yarn build
+
+              echo "Copying React build to Rails public directory..."
+              mkdir -p ${APP_PATH}/backend/public/frontend
+              rsync -av --delete ${APP_PATH}/frontend/build/ ${APP_PATH}/backend/public/frontend/
+
+              echo "Setting up database..."
+              cd ${APP_PATH}/backend
+              bundle exec rails db:create --trace
+              bundle exec rails db:migrate --trace
+
+              echo "Precompiling assets..."
+              bundle exec rails assets:precompile
+
+              echo "Restarting application service..."
+              sudo systemctl restart medicine_record_web.service
+              echo "Deployment complete."
+            EOF
 
 workflows:
   version: 2
@@ -197,12 +209,6 @@ workflows:
       - install_dependencies:
           requires:
             - fetch_source_code
-      - build_react_app:
-          requires:
-            - install_dependencies
-      - setup_test_database:
-          requires:
-            - install_dependencies
       - rspec:
           requires:
             - install_dependencies
@@ -220,4 +226,4 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - master
