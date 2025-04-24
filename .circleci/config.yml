@@ -162,11 +162,11 @@ jobs:
             HOST="43.206.225.98"
             USERNAME="ec2-user"
             APP_PATH="/var/www/medicine_record"
-            GITHUB_USERNAME="your-github-username"
-            REPOSITORY_NAME="your-repository-name"
-            BRANCH_NAME="main"
+            GITHUB_USERNAME="ono0227"
+            REPOSITORY_NAME="MedicineRecord"
+            BRANCH_NAME="master"
 
-            ssh -o StrictHostKeyChecking=no ${USERNAME}@${HOST} << EOF
+            ssh -o StrictHostKeyChecking=no ${USERNAME}@${HOST} \<< EOF
               echo "Creating application directory..."
               mkdir -p ${APP_PATH}/backend
 
