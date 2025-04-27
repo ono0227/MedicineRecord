@@ -205,7 +205,7 @@ jobs:
       - run:
           name: Install Session Manager Plugin
           command: |
-            curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.zip" -o "session-manager-plugin.zip"
+            curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_amd64/session-manager-plugin.zip" -o "session-manager-plugin.zip"
             unzip session-manager-plugin.zip
             sudo ./session-manager-plugin/install
       - run:
