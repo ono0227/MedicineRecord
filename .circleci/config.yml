@@ -13,6 +13,14 @@ executors:
           MYSQL_ROOT_PASSWORD: password
     working_directory: ~/medicine_record
 
+  deploy_container:
+    docker:
+      - image: cimg/base:stable
+    environment:
+      AWS_REGION: ap-northeast-1
+      BACKEND_ECR_REPO: medicinerecord-backend
+      NGINX_ECR_REPO: medicinerecord-nginx
+
 commands:
   install_ruby_dependencies:
     description: Install Ruby dependencies
@@ -145,61 +153,65 @@ jobs:
           key: v1-node-dependencies-{{ checksum "frontend/yarn.lock" }}
       - run_eslint_and_prettier
 
-  deploy_ec2:
-    executor: default_container
+  deploy_fargate:
+    executor: deploy_container
     steps:
       - checkout
       - run:
-          name: Install SSH Client
-          command: sudo apt-get update && sudo apt-get install -y openssh-client
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:FeYaYDVvMAFXTN9B2j73Ufk1akd44ppGpoC536tGeFo"
-      - run:
-          name: Deploy to EC2 via SSH
+          name: Install AWS CLI & Docker
           command: |
-            set -e
-            HOST="43.206.225.98"
-            USERNAME="ec2-user"
-            APP_PATH="/var/www/medicine_record"
-            GITHUB_USERNAME="ono0227"
-            REPOSITORY_NAME="MedicineRecord"
-            BRANCH_NAME="master"
+            sudo apt-get update && sudo apt-get install -y unzip curl docker
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Configure AWS credentials
+          command: |
+            mkdir -p ~/.aws
+            echo "[default]" > ~/.aws/credentials
+            echo "aws_access_key_id=${AWS_ACCESS_KEY_ID}" >> ~/.aws/credentials
+            echo "aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/credentials
+            echo "[default]" > ~/.aws/config
+            echo "region=${AWS_REGION}" >> ~/.aws/config
+      - run:
+          name: Build React app and copy to nginx
+          working_directory: frontend
+          command: |
+            yarn install --frozen-lockfile
+            yarn build
+            rm -rf ../nginx/html
+            mkdir -p ../nginx/html
+            cp -r build/* ../nginx/html/
+      - run:
+          name: Build and Push Backend Image
+          command: |
+            BACKEND_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_ECR_REPO}:latest"
+            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+            docker buildx build --platform linux/amd64 -t $BACKEND_TAG -f backend/Dockerfile ./backend --push
 
-            ssh -o StrictHostKeyChecking=no ${USERNAME}@${HOST} \<< EOF
-              echo "Creating application directory..."
-              mkdir -p ${APP_PATH}/backend
+      - run:
+          name: Build and Push Nginx Image
+          command: |
+            NGINX_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${NGINX_ECR_REPO}:latest"
+            docker buildx build --platform linux/amd64 -t $NGINX_TAG nginx --push
 
-              echo "Cloning repository..."
-              cd ${APP_PATH}/backend
-              git clone -b ${BRANCH_NAME} --depth 1 git@github.com:${GITHUB_USERNAME}/${REPOSITORY_NAME}.git .
-
-              echo "Installing backend dependencies..."
-              bundle install --without development test --deployment
-
-              echo "Installing frontend dependencies..."
-              cd ${APP_PATH}/frontend
-              yarn install --frozen-lockfile --network-concurrency 1
-
-              echo "Building React App..."
-              yarn build
-
-              echo "Copying React build to Rails public directory..."
-              mkdir -p ${APP_PATH}/backend/public/frontend
-              rsync -av --delete ${APP_PATH}/frontend/build/ ${APP_PATH}/backend/public/frontend/
-
-              echo "Setting up database..."
-              cd ${APP_PATH}/backend
-              bundle exec rails db:create --trace
-              bundle exec rails db:migrate --trace
-
-              echo "Precompiling assets..."
-              bundle exec rails assets:precompile
-
-              echo "Restarting application service..."
-              sudo systemctl restart medicine_record_web.service
-              echo "Deployment complete."
-            EOF
+      - run:
+          name: Update ECS Service (nginx and backend)
+          command: |
+            aws ecs update-service --cluster medicinerecord-cluster \
+              --service api-service --force-new-deployment
+            aws ecs update-service --cluster medicinerecord-cluster \
+              --service nginx-service --force-new-deployment
+      - run:
+          name: Run DB Prepare
+          command: |
+            TASK_ID=$(aws ecs list-tasks --cluster medicinerecord-cluster --service-name backend-service --query "taskArns[0]" --output text)
+            aws ecs execute-command \
+              --cluster medicinerecord-cluster \
+              --task "$TASK_ID" \
+              --container backend \
+              --interactive \
+              --command "bundle exec rails db:prepare RAILS_ENV=production"
 
 workflows:
   version: 2
@@ -218,7 +230,7 @@ workflows:
       - eslint_and_prettier:
           requires:
             - install_dependencies
-      - deploy_ec2:
+      - deploy_fargate:
           requires:
             - rspec
             - rubocop

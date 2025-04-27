@@ -9,38 +9,35 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
-  back:
+  backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     environment:
       DATABASE_HOST: db
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: password
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
+      RAILS_ENV: production
     volumes:
       - ./backend:/app
       - uploads_data:/app/public/uploads
       - tmp_data:/app/tmp
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     depends_on:
       - db
-    tty: true
     stdin_open: true
-  front:
+    tty: true
+
+  nginx:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile.dev
-    env_file:
-      - ./frontend/.env.local
-    volumes:
-      - ./frontend:/app
-    command: yarn start
+      context: ./nginx
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
     ports:
-      - "8000:3000"
-    stdin_open: true
-    tty: true
+      - "80:80"
+
 volumes:
   mysql_data:
   uploads_data:
