@@ -13,6 +13,14 @@ executors:
           MYSQL_ROOT_PASSWORD: password
     working_directory: ~/medicine_record
 
+  deploy_container:
+    docker:
+      - image: cimg/base:stable
+    environment:
+      AWS_REGION: ap-northeast-1
+      BACKEND_ECR_REPO: medicinerecord-backend
+      NGINX_ECR_REPO: medicinerecord-nginx
+
 commands:
   install_ruby_dependencies:
     description: Install Ruby dependencies
@@ -146,12 +154,7 @@ jobs:
       - run_eslint_and_prettier
 
   deploy_fargate:
-    docker:
-      - image: cimg/base:stable
-    environment:
-      AWS_REGION: ap-northeast-1
-      BACKEND_ECR_REPO: medicinerecord-backend
-      NGINX_ECR_REPO: medicinerecord-nginx
+    executor: deploy_container
     steps:
       - checkout
       - run:
