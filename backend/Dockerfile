@@ -1,20 +1,24 @@
-FROM ruby:3.4.1
-RUN apt-get update -qq && apt-get install -y nodejs default-mysql-client
+FROM ruby:3.2
+
+# 必要パッケージをインストール
+RUN apt-get update -qq && apt-get install -y nodejs npm default-mysql-client
 
 WORKDIR /app
 
-COPY Gemfile /app/Gemfile
-COPY Gemfile.lock /app/Gemfile.lock
+# Gemfile系を先にコピー（キャッシュ活用）
+COPY Gemfile Gemfile.lock ./
 
-RUN gem install bundler
-RUN bundle install
+# bundler install（本番用）
+RUN gem install bundler && bundle install --without development test
 
-COPY . /app
+# アプリコードをコピー
+COPY . ./
 
-COPY entrypoint.sh /usr/bin/
-RUN chmod +x /usr/bin/entrypoint.sh
-ENTRYPOINT ["entrypoint.sh"]
+# エントリポイントを設定
+COPY entrypoint.prod.sh /usr/bin/entrypoint
+RUN chmod +x /usr/bin/entrypoint
 
-EXPOSE 3000
+ENTRYPOINT ["entrypoint"]
 
-CMD ["rails", "server", "-b", "0.0.0.0"]
+# Puma を起動
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
