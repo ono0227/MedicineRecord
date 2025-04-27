@@ -167,6 +167,13 @@ jobs:
             unzip awscliv2.zip
             sudo ./aws/install
       - run:
+          name: Install Session Manager Plugin
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y unzip
+            curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+            sudo apt install -y ./session-manager-plugin.deb
+      - run:
           name: Configure AWS credentials
           command: |
             mkdir -p ~/.aws
@@ -202,12 +209,6 @@ jobs:
               --service api-service --force-new-deployment
             aws ecs update-service --cluster medicinerecord-cluster \
               --service nginx-service --force-new-deployment
-      - run:
-          name: Install Session Manager Plugin
-          command: |
-            curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_amd64/session-manager-plugin.zip" -o "session-manager-plugin.zip"
-            unzip session-manager-plugin.zip
-            sudo ./session-manager-plugin/install
       - run:
           name: Run DB Prepare
           command: |
