@@ -190,13 +190,11 @@ jobs:
             BACKEND_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_ECR_REPO}:latest"
             aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
             docker buildx build --platform linux/amd64 -t $BACKEND_TAG -f backend/Dockerfile ./backend --push
-
       - run:
           name: Build and Push Nginx Image
           command: |
             NGINX_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${NGINX_ECR_REPO}:latest"
             docker buildx build --platform linux/amd64 -t $NGINX_TAG nginx --push
-
       - run:
           name: Update ECS Service (nginx and backend)
           command: |
@@ -204,6 +202,12 @@ jobs:
               --service api-service --force-new-deployment
             aws ecs update-service --cluster medicinerecord-cluster \
               --service nginx-service --force-new-deployment
+      - run:
+          name: Install Session Manager Plugin
+          command: |
+            curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.zip" -o "session-manager-plugin.zip"
+            unzip session-manager-plugin.zip
+            sudo ./session-manager-plugin/install
       - run:
           name: Run DB Prepare
           command: |
