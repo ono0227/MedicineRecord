@@ -207,7 +207,7 @@ jobs:
       - run:
           name: Run DB Prepare
           command: |
-            TASK_ID=$(aws ecs list-tasks --cluster medicinerecord-cluster --service-name backend-service --query "taskArns[0]" --output text)
+            TASK_ID=$(aws ecs list-tasks --cluster medicinerecord-cluster --service-name api-service --query "taskArns[0]" --output text)
             aws ecs execute-command \
               --cluster medicinerecord-cluster \
               --task "$TASK_ID" \
