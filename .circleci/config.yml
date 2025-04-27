@@ -203,14 +203,15 @@ jobs:
             aws ecs update-service --cluster medicinerecord-cluster \
               --service nginx-service --force-new-deployment
       - run:
-        name: Run DB Prepare
-        command: |
-          aws ecs execute-command \
-            --cluster medicinerecord-cluster \
-            --task $(aws ecs list-tasks --cluster medicinerecord-cluster --service-name backend-service --query "taskArns[0]" --output text) \
-            --container backend \
-            --command "bundle exec rails db:prepare RAILS_ENV=production" \
-            --interactive
+          name: Run DB Prepare
+          command: |
+            TASK_ID=$(aws ecs list-tasks --cluster medicinerecord-cluster --service-name backend-service --query "taskArns[0]" --output text)
+            aws ecs execute-command \
+              --cluster medicinerecord-cluster \
+              --task "$TASK_ID" \
+              --container backend \
+              --interactive \
+              --command "bundle exec rails db:prepare RAILS_ENV=production"
 
 workflows:
   version: 2
