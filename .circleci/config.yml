@@ -186,6 +186,17 @@ jobs:
           name: Build React app and copy to nginx
           working_directory: frontend
           command: |
+            echo "REACT_APP_AUTH_URL=${REACT_APP_AUTH_URL}" >> .env
+            echo "REACT_APP_SIGN_IN_URL=${REACT_APP_SIGN_IN_URL}" >> .env
+            echo "REACT_APP_SIGN_OUT_URL=${REACT_APP_SIGN_OUT_URL}" >> .env
+            echo "REACT_APP_PASSWORD_URL=${REACT_APP_PASSWORD_URL}" >> .env
+            echo "REACT_APP_UPDATE_PASSWORD_URL=${REACT_APP_UPDATE_PASSWORD_URL}" >> .env
+            echo "REACT_APP_LISTEN_AUTH_STATE_URL=${REACT_APP_LISTEN_AUTH_STATE_URL}" >> .env
+            echo "REACT_APP_MEDICINES_URL=${REACT_APP_MEDICINES_URL}" >> .env
+            echo "REACT_APP_POSTS_URL=${REACT_APP_POSTS_URL}" >> .env
+            echo "REACT_APP_CATEGORIES_URL=${REACT_APP_CATEGORIES_URL}" >> .env
+            echo "REACT_APP_WEBHOOK_URL=${REACT_APP_WEBHOOK_URL}" >> .env
+
             yarn install --frozen-lockfile
             yarn build
             rm -rf ../nginx/html
