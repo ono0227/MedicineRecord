@@ -212,13 +212,13 @@ jobs:
       - run:
           name: Run DB Prepare
           command: |
-            TASK_ID=$(aws ecs list-tasks --cluster medicinerecord-cluster --service-name api-service --query "taskArns[0]" --output text)
-            aws ecs execute-command \
+            aws ecs run-task \
               --cluster medicinerecord-cluster \
-              --task "$TASK_ID" \
-              --container backend \
-              --interactive \
-              --command "bundle exec rails db:prepare RAILS_ENV=production"
+              --task-definition medicinerecord-backend-task \
+              --count 1 \
+              --launch-type FARGATE \
+              --network-configuration "awsvpcConfiguration={subnets=[${SUBNETS}],securityGroups=[${SECURITY_GROUPS}],assignPublicIp=ENABLED}" \
+              --overrides '{"containerOverrides": [{"name": "backend","command": ["bundle","exec","rails","db:prepare","RAILS_ENV=production"]}]}'
 
 workflows:
   version: 2
