@@ -6,7 +6,8 @@ CarrierWave.configure do |config|
     config.fog_provider = 'AWS'
     config.fog_credentials = {
       provider: 'AWS',
-      region: ENV['AWS_REGION']
+      region: ENV['AWS_REGION'],
+      use_iam_profile: true
     }
     config.fog_directory  = ENV['AWS_S3_BUCKET_NAME']
     config.fog_public     = false
