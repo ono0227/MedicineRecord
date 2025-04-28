@@ -9,9 +9,10 @@ Rails.application.routes.draw do
       resources :categories
 
       get 'users/currentuser'
-      get 'up' => 'rails/health#show', as: :rails_health_check
     end
   end
+
+  get '/healthcheck', to: proc { [200, {}, ['OK']] }
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
