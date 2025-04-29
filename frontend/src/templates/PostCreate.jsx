@@ -44,8 +44,7 @@ const PostCreate = () => {
   const [medicineName, setMedicineName] = useState(''),
     [medicineImage, setMedicineImage] = useState(''),
     [ingestionAmount, setIngestionAmount] = useState(''),
-    [comment, setComment] = useState(''),
-    [medicineId, setMedicineId] = useState(null)
+    [comment, setComment] = useState('')
 
   const inputIngestionAmount = useCallback(
     (event) => {
@@ -66,15 +65,12 @@ const PostCreate = () => {
       const name = event.target.value
       setMedicineName(name)
       if (medicineNames && medicineNames[name]) {
-        const selected = medicineNames[name]
-        setMedicineImage(selected.medicine_image || '')
-        setMedicineId(selected.id)
+        setMedicineImage(medicineNames[name].medicine_image)
       } else {
         setMedicineImage('')
-        setMedicineId(null)
       }
     },
-    [medicineNames],
+    [medicineNames, setMedicineName],
   )
 
   useEffect(() => {
@@ -88,7 +84,7 @@ const PostCreate = () => {
   }))
 
   const handleCreatePost = () => {
-    dispatch(createPost(ingestionAmount, comment, medicineId))
+    dispatch(createPost(ingestionAmount, comment, medicineName, medicineImage))
     navigate('/timeline')
   }
 
