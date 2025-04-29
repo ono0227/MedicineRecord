@@ -34,10 +34,10 @@ const Post = (props) => {
 
   return (
     <StyledCard onClick={handleClick}>
-      {post.medicine.medicine_image ? (
+      {post?.medicine?.medicine_image ? (
         <StyledCardMedia image={post.medicine.medicine_image} title={post.medicine.name} />
       ) : (
-        <StyledCardMedia title={post.medicine.name}>画像なし</StyledCardMedia>
+        <StyledCardMedia title={post?.medicine?.name || 'No title'}>画像なし</StyledCardMedia>
       )}
       <StyledCardContent>
         <Typography variant="h6" component="h2">
