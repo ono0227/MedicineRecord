@@ -41,7 +41,7 @@ const Post = (props) => {
       )}
       <StyledCardContent>
         <Typography variant="h6" component="h2">
-          {post.medicine.name}
+          {post?.medicine?.name || 'No title'}
         </Typography>
         <Typography variant="body2" color="textSecondary" component="p">
           実際の服薬量：{post.ingestion_amount}
