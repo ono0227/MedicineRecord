@@ -48,7 +48,7 @@ const UserDetail = () => {
               <Grid item>
                 <Avatar
                   alt={username}
-                  src={hasUserimage() ? guestUserImage : userimage}
+                  src={hasUserimage() ? guestUserImage : userimage?.url}
                   sx={{ width: 80, height: 80 }}
                 />
               </Grid>
