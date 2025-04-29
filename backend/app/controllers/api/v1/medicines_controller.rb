@@ -11,7 +11,7 @@ class Api::V1::MedicinesController < Api::V1::AliasController
     # インスタンス変数に格納された薬の情報を単位とカテゴリー名の情報を付加してJSON形式で返す
     medicines_with_category = @medicines.map do |medicine|
       category_name = medicine.category&.name
-      image_url = medicine.medicine_image.present? ? request.base_url + medicine.medicine_image.url : nil
+      image_url = medicine.medicine_image.present? ? medicine.medicine_image.url : nil
 
       medicine.as_json.merge(
         category_name: category_name,

@@ -4,6 +4,7 @@ import CardMedia from '@mui/material/CardMedia'
 import { styled } from '@mui/material/styles'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import defaultMedicineImage from '../../assets/img/defaultMeidicineImage.png'
 
 const StyledCard = styled(Card)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
@@ -52,7 +53,7 @@ const Medicine = (props) => {
       {props.medicineImage ? (
         <StyledCardMedia image={props.medicineImage} title="" onClick={handleClick} />
       ) : (
-        <StyledCardMedia onClick={handleClick}>画像なし</StyledCardMedia>
+        <StyledCardMedia image={defaultMedicineImage} onClick={handleClick} />
       )}
       <StyledCardContent onClick={handleClick}>
         <div>

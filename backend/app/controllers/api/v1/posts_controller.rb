@@ -8,10 +8,11 @@ class Api::V1::PostsController < Api::V1::AliasController
     @posts = current_user.posts.all.includes(:medicine).order(created_at: :desc)
 
     render json: @posts.map { |post|
+      medicine = post.medicine
+      image_url = medicine.medicine_image.present? ? medicine.medicine_image.url : nil
+
       post.as_json.merge(
-        medicine: post.medicine.as_json.merge(
-          medicine_image: post.medicine.medicine_image.present? ? request.base_url + post.medicine.medicine_image.url : nil
-        )
+        medicine: medicine.as_json.merge(medicine_image: image_url)
       )
     }
   end
