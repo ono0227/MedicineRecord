@@ -20,6 +20,16 @@ const DetailPaper = styled(Paper)(({ theme }) => ({
   },
 }))
 
+const PostDetailContainer = styled('section')(({ theme }) => ({
+  minHeight: `calc(100vh - 60px - 80px)`,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  paddingTop: theme.spacing(2),
+  paddingBottom: theme.spacing(4),
+  width: '100%',
+}))
+
 const PostDetail = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -52,7 +62,7 @@ const PostDetail = () => {
   }
 
   return (
-    <section className="c-section-wrapin">
+    <PostDetailContainer className="c-section-wrapin">
       {id && (
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} sm={6} md={4}>
@@ -77,7 +87,7 @@ const PostDetail = () => {
           </Grid>
         </Grid>
       )}
-    </section>
+    </PostDetailContainer>
   )
 }
 
