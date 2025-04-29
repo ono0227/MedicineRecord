@@ -64,20 +64,29 @@ const Timeline = () => {
         .sort((a, b) => b - a)
         .map((timestamp) => dayjs(timestamp))
 
+      const today = dayjs().startOf('day')
+      const hasTodayPost = uniqueSortedDates.some((date) => date.isSame(today, 'day'))
       let count = 0
-      let currentDate = dayjs().startOf('day')
 
-      for (const postDate of uniqueSortedDates) {
-        if (currentDate.isSame(postDate, 'day')) {
-          count++
-          currentDate = currentDate.subtract(1, 'day')
-        } else if (currentDate.isBefore(postDate, 'day')) {
-          // 過去の投稿日が今日より未来の場合は考慮しない
-          continue
-        } else {
-          break
+      if (hasTodayPost) {
+        // 今日投稿がある場合、カウント開始
+        count = 1
+        let currentDate = today.subtract(1, 'day')
+
+        for (const postDate of uniqueSortedDates) {
+          if (currentDate.isSame(postDate, 'day')) {
+            count++
+            currentDate = currentDate.subtract(1, 'day')
+          } else if (currentDate.isAfter(postDate, 'day')) {
+            // 途切れたらストップ
+            break
+          }
         }
+      } else {
+        // 今日投稿がなければ、0日間継続
+        count = 0
       }
+
       setContinuousDays(count)
     } else {
       setContinuousDays(0)
@@ -95,6 +104,11 @@ const Timeline = () => {
       {continuousDays > 0 && (
         <Typography variant="subtitle1" gutterBottom>
           {continuousDays}日間 服薬継続中です！
+        </Typography>
+      )}
+      {continuousDays === 0 && (
+        <Typography variant="subtitle1" gutterBottom>
+          0日間 服薬継続中です！
         </Typography>
       )}
       {loading ? (

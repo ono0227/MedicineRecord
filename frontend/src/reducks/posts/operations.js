@@ -61,7 +61,7 @@ export const deletePost = (id) => {
   }
 }
 
-export const createPost = (ingestionAmount, comment, medicineName, medicineImage) => {
+export const createPost = (ingestionAmount, comment, medicineId) => {
   return async (dispatch) => {
     if (ingestionAmount === '') {
       alert('服薬量を入力してください')
@@ -73,8 +73,7 @@ export const createPost = (ingestionAmount, comment, medicineName, medicineImage
       const formData = new FormData()
       formData.append('post[ingestion_amount]', ingestionAmount)
       formData.append('post[comment]', comment)
-      formData.append('post[medicine_name]', medicineName)
-      formData.append('post[medicine_image]', medicineImage)
+      formData.append('post[medicine_id]', medicineId)
 
       const accessToken = localStorage.getItem('access-token'),
         client = localStorage.getItem('client'),
