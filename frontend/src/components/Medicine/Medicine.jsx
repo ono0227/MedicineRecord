@@ -49,8 +49,8 @@ const Medicine = (props) => {
 
   return (
     <StyledCard>
-      {props.medicineImage && props.medicineImage.url ? (
-        <StyledCardMedia image={props.medicineImage.url} title="" onClick={handleClick} />
+      {props.medicineImage ? (
+        <StyledCardMedia image={props.medicineImage} title="" onClick={handleClick} />
       ) : (
         <StyledCardMedia onClick={handleClick}>画像なし</StyledCardMedia>
       )}

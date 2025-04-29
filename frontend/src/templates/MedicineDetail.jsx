@@ -72,7 +72,13 @@ const MedicineDetail = () => {
         <StyledPaper>
           <Grid container spacing={2}>
             <Grid item xs={12} md={4}>
-              {medicineImage && <img src={medicineImage} alt="薬の画像" style={{ maxWidth: '100%', height: 'auto' }} />}
+              {medicineImage && (
+                <img
+                  src={typeof medicineImage === 'string' ? medicineImage : medicineImage.url}
+                  alt="薬の画像"
+                  style={{ maxWidth: '100%', height: 'auto' }}
+                />
+              )}
             </Grid>
             <Grid item xs={12} md={8}>
               <Typography variant="h6">薬の名前：{medicineName}</Typography>

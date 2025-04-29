@@ -6,7 +6,14 @@ class Api::V1::PostsController < Api::V1::AliasController
   def index
     # ユーザの投稿を全て取得し、関連する薬の情報も含めてJSON形式で返す
     @posts = current_user.posts.all.includes(:medicine).order(created_at: :desc)
-    render json: @posts.as_json(include: :medicine)
+
+    render json: @posts.map { |post|
+      post.as_json.merge(
+        medicine: post.medicine.as_json.merge(
+          medicine_image: post.medicine.medicine_image.present? ? request.base_url + post.medicine.medicine_image.url : nil
+        )
+      )
+    }
   end
 
   # POST /posts
