@@ -38,7 +38,7 @@ const HeaderMenu = (props) => {
       <IconButton onClick={handleMenuToggle}>
         <Avatar
           alt={props.username}
-          src={hasUserimage() ? guestUserImage : props.userimage}
+          src={hasUserimage() ? guestUserImage : props.userimage?.url}
           sx={{ width: 40, height: 40 }}
         />
       </IconButton>
