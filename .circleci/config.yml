@@ -207,12 +207,12 @@ jobs:
           command: |
             BACKEND_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_ECR_REPO}:latest"
             aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-            docker buildx build --platform linux/amd64 -t $BACKEND_TAG -f backend/Dockerfile ./backend --push
+            docker buildx build --platform linux/arm64 -t $BACKEND_TAG -f backend/Dockerfile ./backend --push
       - run:
           name: Build and Push Nginx Image
           command: |
             NGINX_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${NGINX_ECR_REPO}:latest"
-            docker buildx build --platform linux/amd64 -t $NGINX_TAG nginx --push
+            docker buildx build --platform linux/arm64 -t $NGINX_TAG nginx --push
       - run:
           name: Update ECS Service (nginx and backend)
           command: |
