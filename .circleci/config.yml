@@ -160,6 +160,14 @@ jobs:
       - setup_remote_docker:
           version: 20.10.24
       - run:
+          name: Set up Docker Buildx and QEMU
+          command: |
+            docker run --privileged --rm tonistiigi/binfmt --install all
+            docker buildx inspect arm64builder >/dev/null 2>&1 || docker buildx create --name arm64builder
+            docker buildx use arm64builder
+            docker buildx inspect --bootstrap
+
+      - run:
           name: Install AWS CLI & Docker
           command: |
             sudo apt-get update && sudo apt-get install -y unzip curl docker
